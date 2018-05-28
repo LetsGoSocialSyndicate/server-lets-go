@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')

@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 'use strict'
 
 const environment = process.env.NODE_ENV || 'development'

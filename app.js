@@ -1,13 +1,19 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 const boom = require('boom')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
+const { verifyToken } = require('./utilities/jwtUtil')
 
-const usersRouter = require('./routes/users')
 const eventsRouter = require('./routes/events')
+const loginRouter = require('./routes/login')
+const usersRouter = require('./routes/users')
 
 const app = express()
+app.disable('x-powered-by')
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -16,8 +22,23 @@ app.use(cookieParser())
 
 app.use(express.static(path.join(__dirname, '/public')))
 
-app.use('/users', usersRouter)
-app.use('/events', eventsRouter)
+// CORS options in header
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PATCH, DELETE, PUT')
+  res.header('Referrer-Policy', 'no-referrer')
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  else {
+    next()
+  }
+})
+
+app.use('/login', loginRouter)
+app.use('/events', verifyToken, eventsRouter)
+app.use('/users', verifyToken, usersRouter)
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

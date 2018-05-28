@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 exports.up = (knex, Promise) => {
   return knex.schema.createTable('user_rating', (table) => {
     table.uuid('id')
