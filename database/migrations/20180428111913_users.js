@@ -15,7 +15,7 @@ exports.up = (knex, Promise) => {
     // Gender is optional, but we will filter by gender
     table.varchar('gender', 255).notNullable().defaultTo('')
     // will add correct "type" and also defaultTo user_pic
-    table.binary('image').notNullable()
+    table.binary('image')
     table.text('about').notNullable().defaultTo('')
     // How fast user answers
     table.integer('avg_speed_min').notNullable().defaultTo(0)
