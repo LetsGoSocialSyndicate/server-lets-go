@@ -13,7 +13,7 @@ exports.seed = (knex, Promise) => {
           last_name: 'Doe',
           username: 'jane',
           email: 'jane.doe@email.com',
-          hashed_password: '$2a$10$PD1unSwYylML0GGAExsWfOwHsUUNGNO3DG0fZm2FJaS5s0Ul44WSC',
+          hashed_password: '$2b$10$uh0Y5nzAA80lZHQZEc6uzeeI5UDB.TPScJ/6T/OMdTSMzzGSSBPhm',
           gender: 'female',
           university_id: UUID_UNIVERSITY_OF_COLORADO
         }
