@@ -14,7 +14,6 @@ exports.up = (knex, Promise) => {
     table.foreign('user_rated').references('id').inTable('users').onDelete('cascade')
 
     table.timestamps(true, true)
-
   })
     .then(() => {
       return knex.schema.alterTable('user_rating', (table) => {

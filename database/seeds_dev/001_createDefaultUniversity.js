@@ -1,15 +1,17 @@
+const { UUID_UNIVERSITY_OF_COLORADO, universityTable } = require('../services/constants')
 
 exports.seed = (knex, Promise) => {
   // Deletes ALL existing entries
-  return knex('universities').del()
+  return knex(universityTable).del()
     .then(() => {
       // Inserts seed entries
-      return knex('universities').insert([
+      return knex(universityTable).insert([
         {
-          id: 'a8471c7a-16c4-480d-8c2b-ce05af92417d',
-          name: 'University of Colorado'},
+          id: UUID_UNIVERSITY_OF_COLORADO,
+          name: 'University of Colorado',
           email_domain: 'colorado.edu',
           address: 'Boulder, Colorado'
+        }
       ])
     })
 }
