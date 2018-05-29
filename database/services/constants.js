@@ -4,4 +4,9 @@
 const userTable = 'users'
 const eventTable = 'events'
 
-module.export = { userTable, eventTable }
+const UUID_UNIVERSITY_OF_COLORADO = ''
+
+module.export = {
+  UUID_UNIVERSITY_OF_COLORADO,
+  userTable, eventTable
+}
