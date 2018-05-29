@@ -1,7 +1,8 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { eventTable } = require('../services/constants')
+const { eventTable, userTable } = require('../services/constants')
+
 exports.up = (knex, Promise) => {
   return knex.schema.createTable(eventTable, (table) => {
     table.uuid('id')
@@ -13,10 +14,10 @@ exports.up = (knex, Promise) => {
     table.text('description').notNullable().defaultTo('')
 
     table.uuid('user_owner_id').notNullable()
-    table.foreign('user_owner_id').references('id').inTable('users').onDelete('cascade')
+    table.foreign('user_owner_id').references('id').inTable(userTable).onDelete('cascade')
 
     table.uuid('user_participant_id').notNullable()
-    table.foreign('user_participant_id').references('id').inTable('users').onDelete('cascade')
+    table.foreign('user_participant_id').references('id').inTable(userTable).onDelete('cascade')
     table.timestamps(true, true)
   })
     .then(() => {

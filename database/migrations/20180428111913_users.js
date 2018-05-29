@@ -1,7 +1,7 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { userTable } = require('../services/constants')
+const { userTable, universityTable } = require('../services/constants')
 
 exports.up = (knex, Promise) => {
   return knex.schema.createTable(userTable, (table) => {
@@ -21,7 +21,7 @@ exports.up = (knex, Promise) => {
     table.integer('avg_speed_min').notNullable().defaultTo(0)
 
     table.uuid('university_id').notNullable()
-    table.foreign('university_id').references('id').inTable('universities')
+    table.foreign('university_id').references('id').inTable(universityTable)
 
     table.timestamps(true, true)
   })
