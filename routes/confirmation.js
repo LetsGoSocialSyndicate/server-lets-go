@@ -57,3 +57,6 @@ router.get('/:token', (req, res, next) => {
 })
 
 module.exports = router
+// crontab OR https://www.npmjs.com/package/webworker-threads
+// for deleting unused tokens after 24 hours
+// https://corenominal.org/2016/05/12/howto-setup-a-crontab-file/
