@@ -9,11 +9,11 @@ exports.up = (knex, Promise) => {
     table.varchar('token', 256).notNullable()
     table.timestamps(true, true)
   })
-  .then(() => {
-    return knex.schema.alterTable(tokenTable, (table) => {
-      table.unique('token')
+    .then(() => {
+      return knex.schema.alterTable(tokenTable, (table) => {
+        table.unique('token')
+      })
     })
-  })
 }
 exports.down = (knex, Promise) => {
   return knex.schema.dropTableIfExists(tokenTable)
