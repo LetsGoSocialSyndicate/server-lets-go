@@ -9,6 +9,8 @@ exports.up = (knex, Promise) => {
     table.integer('number_of_stars').notNullable().defaultTo(0)
     table.text('comment').notNullable().defaultTo('')
 
+    table.dateTime('rated_at').notNullable().defaultTo(knex.raw('now()'))
+
     table.uuid('rated_by').notNullable()
     table.foreign('rated_by').references('id').inTable(userTable).onDelete('cascade')
 
