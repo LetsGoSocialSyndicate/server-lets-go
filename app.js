@@ -7,10 +7,15 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const { verifyToken } = require('./utilities/jwtUtil')
+const nodemailer = require('nodemailer')
+const bodyParser = require('body-parser')
+const exphbs = require('express-handlebars')
 
+const signupRouter = require('./routes/signup')
 const eventsRouter = require('./routes/events')
 const loginRouter = require('./routes/login')
 const usersRouter = require('./routes/users')
+const confirmationRouter = require('./routes/confirmation')
 
 const app = express()
 app.disable('x-powered-by')
@@ -36,9 +41,22 @@ app.use((req, res, next) => {
   }
 })
 
+//View engine setup
+app.engine('handlebars', exphbs())
+app.set('view engine', 'handlebars')
+
+//Body parser Middleware
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
+//Static folder
+app.use('/public', express.static(path.join(__dirname, 'public')))
+
 app.use('/login', loginRouter)
+app.use('/signup', signupRouter)
 app.use('/events', verifyToken, eventsRouter)
 app.use('/users', verifyToken, usersRouter)
+app.use('/confirmation', confirmationRouter)
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -47,6 +65,7 @@ app.use((req, res, next) => {
 
 // error handler
 app.use((err, req, res, next) => {
+  console.log("all-catch err:", err)
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
@@ -55,5 +74,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500)
   res.json(err)
 })
+
+app.listen(8000, () => 'Server listens...')
 
 module.exports = app

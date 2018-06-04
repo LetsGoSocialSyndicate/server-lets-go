@@ -17,6 +17,7 @@ function noCaching(res) {
   res.setHeader('Cache-Control', `no-cache, no-store, must-revalidate`)
 }
 
+//for Logged in request:
 function verifyToken(req, res, next) {
   console.log('verifyToken - cookies: ', req.cookies)
   if (req.session.passport) {

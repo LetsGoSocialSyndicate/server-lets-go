@@ -1,3 +1,5 @@
+const { UUID_UNIVERSITY_OF_COLORADO } = require('./constants')
+
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
@@ -37,8 +39,7 @@ class UserService {
         throw boom.notFound(`No user found for the id, ${id}`)
       })
       .catch((err) => {
-        console.log('get User: err', err)
-        throw boom.badImplementation(`Error retrieving user with the id, ${id}`)
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user with the id, ${id}`)
       })
   }
 
@@ -49,6 +50,7 @@ class UserService {
     return knex(userTable)
       .where('username', username)
       .then((rows) => {
+        console.log("getByUsername rows", rows)
         if (rows.length === 1) {
           return rows[0]
         }
@@ -58,8 +60,7 @@ class UserService {
         throw boom.notFound(`No users found for the username, ${username}`)
       })
       .catch((err) => {
-        console.log('get User by Username: err', err)
-        throw boom.badImplementation(`Error retrieving user by the username, ${username}`)
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by the username, ${username}`)
       })
   }
 
@@ -79,12 +80,15 @@ class UserService {
         middle_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
+        username: user.username,
         hashed_password: user.hashed_password,
         gender: user.gender,
         image: user.image,
         about: user.about,
+        is_verified: user.is_verified,
+        birthday: user.birthday,
         avg_speed_min: user.avg_speed_min,
-        university_id: user.university_id
+        university_id: UUID_UNIVERSITY_OF_COLORADO
       })
       .then((rows) => {
         if (rows.length === 1) {
@@ -96,8 +100,7 @@ class UserService {
         throw boom.badImplementation(`Unable to insert user`)
       })
       .catch((err) => {
-        console.log('Insert user: err', err)
-        throw boom.badImplementation(`Error inserting user`)
+        throw err.isBoom ? err : boom.badImplementation(`Error inserting user`)
       })
   }
 
@@ -108,9 +111,9 @@ class UserService {
     if (!user.email) {
       throw boom.badRequest('Email must not be blank')
     }
-
+    // TODO: do I need to pass all fields here?
     return knex(userTable)
-      .returning('*')
+      .where('username', user.username)
       .update({
         first_name: user.first_name,
         middle_name: user.first_name,
@@ -119,10 +122,13 @@ class UserService {
         hashed_password: user.hashed_password,
         gender: user.gender,
         image: user.image,
-        about: user.about
+        about: user.about,
+        is_verified: user.is_verified
         // Not sure, if we let them update university_id
       })
+      .returning('*')
       .then((rows) => {
+        console.log("update rows", rows)
         if (rows.length === 1) {
           return rows[0]
         }
@@ -132,8 +138,7 @@ class UserService {
         throw boom.badImplementation(`Unable to update user`)
       })
       .catch((err) => {
-        console.log('update: err', err)
-        throw boom.badImplementation(`Error updating user`)
+        throw err.isBoom ? err : boom.badImplementation(`Error updating user`)
       })
   }
 
@@ -156,8 +161,7 @@ class UserService {
         throw boom.badImplementation(`Unable to delete user`)
       })
       .catch((err) => {
-        console.log('delete: err', err)
-        throw boom.badImplementation(`Error deleting user`)
+        throw err.isBoom ? err : boom.badImplementation(`Error deleting user`)
       })
   }
 }

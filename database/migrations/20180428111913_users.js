@@ -11,6 +11,8 @@ exports.up = (knex, Promise) => {
     table.varchar('last_name', 255).notNullable()
     table.varchar('username', 255).notNullable()
     table.varchar('email', 255).notNullable()
+    table.boolean('is_verified').notNullable().defaultTo(false)
+    table.date('birthday').notNullable()
     table.specificType('hashed_password', 'CHAR(60)')
     // Gender is optional, but we will filter by gender
     table.varchar('gender', 255).notNullable().defaultTo('')
@@ -21,14 +23,14 @@ exports.up = (knex, Promise) => {
     table.integer('avg_speed_min').notNullable().defaultTo(0)
 
     table.uuid('university_id').notNullable()
-    table.foreign('university_id').references('id').inTable(universityTable)
 
     table.timestamps(true, true)
   })
     .then(() => {
       return knex.schema.alterTable(userTable, (table) => {
         table.unique('id')
-        table.unique('email')
+        table.unique('username')
+        // table.foreign('university_id').references('id').inTable(universityTable)
       })
     })
 }
