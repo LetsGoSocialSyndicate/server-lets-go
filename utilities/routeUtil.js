@@ -4,8 +4,8 @@
 const { INVALID_INPUT } = require('./constants')
 
 const  constructFailure = (errorType, msg, code) => {
-  console.log('ERROR:', {errorType: errorType, message: msg})
-  return {errorType: errorType, message: msg, statusCode: code}
+  console.log('ERROR:', { errorType: errorType, message: msg })
+  return { errorType: errorType, message: msg, statusCode: code }
 }
 
 const invalidInput = (msg) => {
@@ -13,8 +13,8 @@ const invalidInput = (msg) => {
 }
 
 const constructSuccess = (msg) => {
-  console.log("SUCCESS:", {message: msg})
-  return {message: msg}
+  console.log('SUCCESS:', { message: msg })
+  return { message: msg, statusCode: 200 }
 }
 
 module.exports = {

@@ -29,13 +29,15 @@ router.get('/:token', (req, res, next) => {
     const tokenAge = Date.now() - created_at
     if (tokenAge > ONE_DAY) {
       tokenService.delete(token).then(result => {
-        return res.status(401).send(constructFailure(TOKEN_EXPIRED, 'The token has expired.'))
+        next(constructFailure(TOKEN_EXPIRED, 'The token has expired.', 401))
+        return
       })
     }
     userService.getByEmail(result.email).then(result => {
       if(result.verified_at) {
         tokenService.delete(token).then(result => {
-          return res.status(401).send(constructFailure(ALREADY_VERIFIED, 'Account already verified.'))
+          next(constructFailure(ALREADY_VERIFIED, 'Account already verified.', 401))
+          return
         })
       }
       result.verified_at = moment().format('YYYY-MM-DD')
@@ -48,13 +50,13 @@ router.get('/:token', (req, res, next) => {
   }).catch((err) => {
     console.log("confirmation error:", err)
     let status = 500
-    let payload = constructFailure(DATABASE_ERROR, 'Error while confirming account.')
+    let payload = constructFailure(DATABASE_ERROR, 'Error while confirming account.', status)
     if (err.isBoom) {
       const data = err.data ? err.data : {}
       status = err.output.statusCode
       payload =  {...data, ...err.output.payload}
     }
-    return res.status(status).send(payload)
+    next(payload)
   })
 })
 

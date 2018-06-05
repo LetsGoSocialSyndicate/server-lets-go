@@ -126,19 +126,19 @@ router.post('/', (req, res, next) => {
         return res.status(200).send(constructSuccess('A verification email has been sent to ' + email + '.'))
       }).catch(err => {
         console.log("email error:", err)
-        return res.status(500).send(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email'))
+        next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
       })
     })
   }).catch((err) => {
     console.log("signup error:", err)
     let status = 500
-    let payload = constructFailure(DATABASE_ERROR, 'Error while inserting new user into database')
+    let payload = constructFailure(DATABASE_ERROR, 'Error while inserting new user into database', status)
     if (err.isBoom) {
       const data = err.data ? err.data : {}
       status = err.output.statusCode
       payload =  {...data, ...err.output.payload}
     }
-    return res.status(status).send(payload)
+    next(payload)
   })
 })
 
