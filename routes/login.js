@@ -7,7 +7,8 @@ const knex = require('../knex')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userServices')
-const { NOT_VERIFIED, BAD_PASSWORD, INVALID_INPUT } = require('./routesConstants')
+const {invalidInput} = require('../utilities/routeUtil')
+const { NOT_VERIFIED, BAD_PASSWORD } = require('../utilities/constants')
 
 require('dotenv').config()
 
@@ -33,7 +34,7 @@ router.post('/', (req, res, next) => {
       })
   }
   else {
-    res.status(400).send({ errorType: INVALID_INPUT, msg: 'username and/or password was not sent' })
+    return invalidInput(res, 'username and/or password was not sent')
   }
 })
 

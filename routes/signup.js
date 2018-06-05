@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userServices')
 const TokenService = require('../database/services/tokenService')
-const {INVALID_INPUT, ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, DATABASE_ERROR, SENDING_MAIL_ERROR} = require('./routesConstants')
+const {ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, DATABASE_ERROR, SENDING_MAIL_ERROR} = require('../utilities/constants')
 const {constructFailure, invalidInput} = require('../utilities/routeUtil')
 
 const verifyUserNotInDatabase = (userService, username) => {
@@ -42,16 +42,16 @@ router.post('/', (req, res, next) => {
     birthday
   } = req.body
   if (!username) {
-    return invalidInput("Username cannot be blank")
+    return invalidInput(res, "Username cannot be blank")
   }
   if (!birthday) {
-    return invalidInput("Birthday cannot be blank")
+    return invalidInput(res, "Birthday cannot be blank")
   }
   if (!email) {
-    return invalidInput("Email cannot be blank")
+    return invalidInput(res, "Email cannot be blank")
   }
   if (!password) {
-    return invalidInput("Password cannot be blank")
+    return invalidInput(res, "Password cannot be blank")
   }
 
   const userService = new UserService()

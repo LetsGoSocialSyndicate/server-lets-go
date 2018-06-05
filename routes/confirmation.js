@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userServices')
 const TokenService = require('../database/services/tokenService')
 const {constructFailure, invalidInput} = require('../utilities/routeUtil')
-const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('./routesConstants')
+const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('../utilities/constants')
 
 const ONE_DAY = 1000 * 3600 * 24
 
@@ -16,7 +16,7 @@ router.get('/:token', (req, res, next) => {
   const {token} = req.params
 
   if (!token) {
-    return invalidInput("Invalid link with missing token")
+    return invalidInput(res, "Invalid link with missing token")
   }
 
   const tokenService = new TokenService()
