@@ -50,7 +50,7 @@ class UserService {
     return knex(userTable)
       .where('username', username)
       .then((rows) => {
-        console.log("getByUsername rows", rows)
+        console.log('getByUsername rows', rows)
         if (rows.length === 1) {
           return rows[0]
         }
@@ -61,6 +61,27 @@ class UserService {
       })
       .catch((err) => {
         throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by the username, ${username}`)
+      })
+  }
+
+  getByEmail(email) {
+    if (!email) {
+      throw boom.badRequest('Email is required')
+    }
+    return knex(userTable)
+      .where('email', email)
+      .then((rows) => {
+        console.log('getByEmail rows', rows)
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many users for the email, ${email}`)
+        }
+        throw boom.notFound(`No users found for the email, ${email}`)
+      })
+      .catch((err) => {
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by email, ${email}`)
       })
   }
 
