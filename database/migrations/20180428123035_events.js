@@ -8,7 +8,7 @@ exports.up = (knex, Promise) => {
     table.uuid('id')
     table.string('title', 255).notNullable()
     table.string('location', 255).notNullable()
-    table.string('icon_url', 255).notNullable().defaultTo('')
+    table.string('icon_url', 255).notNullable().defaultTo('https://dtkp6g0samjql.cloudfront.net/uploads/photo/file/12571356/gallery_hero_fd7e2c1a-8970-4187-814e-5a77a1717f1e.jpg')
     table.string('category', 255).notNullable().defaultTo('')
     table.text('description').notNullable().defaultTo('')
     table.dateTime('start_time').notNullable().defaultTo(knex.raw('now()'))

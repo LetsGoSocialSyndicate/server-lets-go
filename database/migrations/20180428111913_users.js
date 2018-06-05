@@ -18,7 +18,7 @@ exports.up = (knex, Promise) => {
     // Gender is optional, but we will filter by gender
     table.varchar('gender', 255).notNullable().defaultTo('')
     // will add correct "type" and also defaultTo user_pic
-    table.text('image_url')
+    table.text('image_url').defaultTo('http://akilezwebsolutions.com/wp-content/uploads/avatar-7.png')
     table.text('about').notNullable().defaultTo('')
 
     table.uuid('university_id').notNullable()
