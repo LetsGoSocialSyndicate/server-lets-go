@@ -7,6 +7,23 @@ const uuid = require('uuid/v4')
 const { userTable, eventTable, userEventTable, USER_EVENT_FIELDS } = require('./constants')
 
 class UserEventService {
+  getAllEvents() {
+    return knex(userTable)
+      .select(USER_EVENT_FIELDS)
+      .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .then((rows) => {
+        if (rows.length > 0) {
+          return rows
+        }
+        throw boom.notFound(`No events found`)
+      })
+      .catch((err) => {
+        console.log('getAllEventsByParticipant: err', err)
+        throw boom.badImplementation(`Error retrieving events`)
+      })
+  }
+
   getAllEventsByParticipant(userId) {
     if (!userId) {
       throw boom.badRequest('User id is required')

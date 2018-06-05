@@ -12,8 +12,8 @@ const { formatName } = require('../utilities/miscUtils')
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
-  const eventService = new EventService()
-  eventService.getList()
+  const eventService = new UserEventService()
+  eventService.getAllEvents()
     .then((rows) => {
       res.json(rows)
     })
