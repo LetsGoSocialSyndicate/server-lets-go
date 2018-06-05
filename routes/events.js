@@ -3,9 +3,12 @@
  */
 const express = require('express')
 const router = express.Router()
-const { constructFailure, invalidInput } = require('../utilities/routeUtil')
+const nodemailer = require('nodemailer')
 const EventService = require('../database/services/eventService')
 const UserEventService = require('../database/services/userEventService')
+const { SENDING_MAIL_ERROR } = require('../utilities/constants')
+const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
+const { formatName } = require('../utilities/miscUtils')
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
@@ -90,20 +93,57 @@ router.delete('/:id', (req, res, next) => {
     .catch((err) => next(err))
 })
 
+const sendNotification = (organizers, requestor) => {
+  if (!organizers || organizers.length === 0) {
+    next(constructFailure(SENDING_MAIL_ERROR, 'No event organizers are available', 500))
+    return
+  }
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.LETS_GO_EMAIL,
+      pass: process.env.LETS_GO_EMAIL_PASSWORD
+    }
+  })
+
+  organizers.forEach((organizer) => {
+    const mailOptions = {
+      from: process.env.LETS_GO_EMAIL,
+      to: organizer.email,
+      subject: `Let's Go: Join Request`,
+      text: `Hello ${organizer.first_name},\n
+      ${formatName(requestor)} has requested to join your event.\n
+      Please login to Let's Go app and accept or reject the request.`
+    }
+    transporter.sendMail(mailOptions).then(result => {
+      return res.status(200).send(constructSuccess(`A verification email has been sent to ${organizer.email}.`))
+    }).catch(err => {
+      console.log('email error:', err)
+      next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
+    })
+  })
+}
+
 // user is requesting to participate in the event
 // The event_id param is event id.
 router.post('/request/:event_id', (req, res, next) => {
   const userEventService = new UserEventService()
+  const eventService = new EventService()
   const record = {
     event_id: req.params.event_id,
     requested_by: req.user.id,
     requested_at: new Date()
   }
   userEventService.insert(record)
-    .then((row) => res.json(row))
+    .then((row) => {
+      res.json(row)
+      eventService.getEventOrganizers(row.event_id)
+        .then((organizers) => {
+          // send email to the organizer that a person has requested to join the event.
+          sendNotification(organizers, req.user)
+        })
+    })
     .catch((err) => next(err))
-
-  // send email to the organizer that a person has requested to join the event.
 })
 
 // user is accepting the request to participate
