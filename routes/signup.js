@@ -16,10 +16,10 @@ const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { USER_ROLE_REGULAR } = require('../database/services/constants')
 
-const verifyUserNotInDatabase = (userService, username) => {
-  return userService.getByUsername(username).then(result => {
+const verifyUserNotInDatabase = (userService, email) => {
+  return userService.getByEmail(email).then(result => {
     throw boom.badRequest(
-      'The username you have entered is already ' +
+      'The email you have entered is already ' +
       'associated with another account.', {
       errorType: result.verified_at
         ? ALREADY_EXISTS
@@ -55,7 +55,6 @@ const isOlderThan18 = (birthday) => {
 
 router.post('/', (req, res, next) => {
   const {
-    username,
     email,
     password,
     firstName,
@@ -64,11 +63,6 @@ router.post('/', (req, res, next) => {
     gender,
     birthday
   } = req.body
-  console.log(req.body)
-  if (!username) {
-    next(invalidInput("Username cannot be blank"))
-    return
-  }
   if (!birthday) {
     next(invalidInput("Birthday cannot be blank"))
     return
@@ -89,15 +83,14 @@ router.post('/', (req, res, next) => {
   const userService = new UserService()
   const tokenService = new TokenService()
 
-  verifyUserNotInDatabase(userService, username).then(() => {
+  verifyUserNotInDatabase(userService, email).then(() => {
     // Create and save the user
+    // By default verified_at is null
     const user = {
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
-      username: username,
       email: email,
-      verified_at: null,
       hashed_password: bcrypt.hashSync(password, 8),
       gender: gender,
       birthday: birthday,
@@ -106,7 +99,7 @@ router.post('/', (req, res, next) => {
     return userService.insert(user)
   }).then(result => {
     const tokenEntry = {
-      username: username,
+      email: email,
       token: crypto.randomBytes(128).toString('hex') //we will need 256 in migrations
     }
     // TODO: check if token exists and return error.
