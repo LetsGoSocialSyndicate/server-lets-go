@@ -41,6 +41,7 @@ router.post('/', (req, res, next) => {
   } = req.body
   if (!title) {
     next(invalidInput('The event title may not be blank'))
+    return
   }
   eventService.insert({
     title,
@@ -77,6 +78,7 @@ router.patch('/:id', (req, res, next) => {
   } = req.body
   if (!title) {
     next(invalidInput('The event title may not be blank'))
+    return
   }
 })
 
@@ -85,6 +87,62 @@ router.delete('/:id', (req, res, next) => {
   const { id } = req.params
   eventService.delete(id)
     .then((row) => res.json(row))
+    .catch((err) => next(err))
+})
+
+// user is requesting to participate in the event
+// The event_id param is event id.
+router.post('/request/:event_id', (req, res, next) => {
+  const userEventService = new UserEventService()
+  const record = {
+    event_id: req.params.event_id,
+    requested_by: req.user.id,
+    requested_at: new Date()
+  }
+  userEventService.insert(record)
+    .then((row) => res.json(row))
+    .catch((err) => next(err))
+
+  // send email to the organizer that a person has requested to join the event.
+})
+
+// user is accepting the request to participate
+// The request_id param is user-event id.
+router.patch('/accept/:request_id', (req, res, next) => {
+  const userEventService = new UserEventService()
+  userEventService.get(req.params.request_id)
+    .then((row) => {
+      if (row.requested_by && row.requested_at &&
+          !row.rejected_by && !row.rejected_at) {
+        const record = {
+          id: req.params.request_id,
+          accepted_by: req.user.id,
+          accepted_at: new Date()
+        }
+        userEventService.update(record)
+          .then((updated) => res.json(updated))
+      }
+    })
+    .catch((err) => next(err))
+})
+
+// user is rejecting the request to participate
+// The request_id param is user-event id.
+router.patch('/reject/:request_id', (req, res, next) => {
+  const userEventService = new UserEventService()
+  userEventService.get(req.params.request_id)
+    .then((row) => {
+      if (row.requested_by && row.requested_at &&
+          !row.accepted_by && !row.accepted_at) {
+        const record = {
+          id: req.params.request_id,
+          rejected_by: req.user.id,
+          rejected_at: new Date()
+        }
+        userEventService.update(record)
+          .then((updated) => res.json(updated))
+      }
+    })
     .catch((err) => next(err))
 })
 
