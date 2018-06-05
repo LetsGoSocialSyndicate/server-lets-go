@@ -13,7 +13,7 @@ const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
   DATABASE_ERROR, SENDING_MAIL_ERROR } = require('../utilities/constants')
-const { constructFailure, invalidInput } = require('../utilities/routeUtil')
+const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { USER_ROLE_REGULAR } = require('../database/services/constants')
 
 const verifyUserNotInDatabase = (userService, username) => {
