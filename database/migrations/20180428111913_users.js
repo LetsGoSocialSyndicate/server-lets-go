@@ -13,7 +13,7 @@ exports.up = (knex, Promise) => {
     table.varchar('username', 255).notNullable()
     table.varchar('email', 255).notNullable()
     table.varchar('role', 255).notNullable()
-    table.dateTime('verified_at').notNullable().defaultTo(knex.raw('now()'))
+    table.dateTime('verified_at')
     table.date('birthday').notNullable()
     table.specificType('hashed_password', 'CHAR(60)')
     // Gender is optional, but we will filter by gender
