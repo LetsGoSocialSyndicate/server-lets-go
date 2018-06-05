@@ -76,3 +76,5 @@ class UserEventService {
     }
   }
 }
+
+module.exports = UserEventService
