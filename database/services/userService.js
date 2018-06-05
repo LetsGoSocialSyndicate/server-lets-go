@@ -121,6 +121,7 @@ class UserService {
         throw boom.badImplementation(`Unable to insert user`)
       })
       .catch((err) => {
+        console.log(err)
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user`)
       })
   }

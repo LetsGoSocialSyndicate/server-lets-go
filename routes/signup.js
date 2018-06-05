@@ -15,6 +15,7 @@ const { INVALID_INPUT, ALREADY_EXISTS,
   ALREADY_EXISTS_UNVERIFIED, DATABASE_ERROR,
   SENDING_MAIL_ERROR } = require('../utilities/routesConstants')
 const { constructFailure, invalidInput } = require('../utilities/routeUtil')
+const { USER_ROLE_REGULAR } = require('../database/services/constants')
 
 const verifyUserNotInDatabase = (userService, username) => {
   return userService.getByUsername(username).then(result => {
@@ -32,6 +33,27 @@ const verifyUserNotInDatabase = (userService, username) => {
   })
 }
 
+const isOlderThan18 = (birthday) => {
+  const today = new Date()
+  console.log(birthday, today)
+  if (today.getFullYear() - birthday.getFullYear() > 18) {
+    return true
+  }
+  if (today.getFullYear() - birthday.getFullYear() < 18) {
+    return false
+  }
+  if (today.getMonth() > birthday.getMonth()) {
+    return true
+  }
+  if (today.getMonth() < birthday.getMonth()) {
+    return false
+  }
+  if (today.getDate() >= birthday.getDate()) {
+    return true
+  }
+  return false
+}
+
 router.post('/', (req, res, next) => {
   const {
     username,
@@ -43,17 +65,26 @@ router.post('/', (req, res, next) => {
     gender,
     birthday
   } = req.body
+  console.log(req.body)
   if (!username) {
     next(invalidInput("Username cannot be blank"))
+    return
   }
   if (!birthday) {
     next(invalidInput("Birthday cannot be blank"))
+    return
   }
   if (!email) {
     next(invalidInput("Email cannot be blank"))
+    return
   }
   if (!password) {
     next(invalidInput("Password cannot be blank"))
+    return
+  }
+  if (!isOlderThan18(new Date(birthday))) {
+    next(invalidInput("You must be 18 or older to signup"))
+    return
   }
 
   const userService = new UserService()
@@ -70,7 +101,8 @@ router.post('/', (req, res, next) => {
       verified_at: null,
       hashed_password: bcrypt.hashSync(password, 8),
       gender: gender,
-      birthday: birthday
+      birthday: birthday,
+      role: USER_ROLE_REGULAR
     }
     return userService.insert(user)
   }).then(result => {
