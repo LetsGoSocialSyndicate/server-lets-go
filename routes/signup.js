@@ -14,6 +14,7 @@ const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
   DATABASE_ERROR, SENDING_MAIL_ERROR } = require('../utilities/constants')
 const { constructFailure, invalidInput } = require('../utilities/routeUtil')
+const { USER_ROLE_REGULAR } = require('../database/services/constants')
 
 const verifyUserNotInDatabase = (userService, username) => {
   return userService.getByUsername(username).then(result => {
