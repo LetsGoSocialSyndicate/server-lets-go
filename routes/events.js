@@ -3,8 +3,11 @@
  */
 const express = require('express')
 const router = express.Router()
+const { constructFailure, invalidInput } = require('../utilities/routeUtil')
 const EventService = require('../database/services/eventService')
+const UserEventService = require('../database/services/userEventService')
 const eventService = new EventService()
+const userEventService = new UserEventService()
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
@@ -32,17 +35,34 @@ router.post('/', (req, res, next) => {
     category,
     description,
     start_time,
-    end_time,
-    birthday
+    end_time
   } = req.body
+  if (!title) {
+    next(invalidInput('The event title may not be blank'))
+  }
 })
 
 router.patch('/:id', (req, res, next) => {
-  res.send('respond with a resource')
+  const { id } = req.params
+  const {
+    title,
+    location,
+    icon_url,
+    category,
+    description,
+    start_time,
+    end_time
+  } = req.body
+  if (!title) {
+    next(invalidInput('The event title may not be blank'))
+  }
 })
 
 router.delete('/:id', (req, res, next) => {
-  res.send('respond with a resource')
+  const { id } = req.params
+  eventService.delete(id)
+    .then((row) => res.json(row))
+    .catch((err) => next(err))
 })
 
 module.exports = router
