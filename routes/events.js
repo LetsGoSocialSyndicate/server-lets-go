@@ -105,6 +105,8 @@ const sendNotification = (organizers, requestor) => {
       pass: process.env.LETS_GO_EMAIL_PASSWORD
     }
   })
+  // console.log('organizers', organizers)
+  // console.log('requestor', requestor)
 
   organizers.forEach((organizer) => {
     const mailOptions = {
@@ -115,12 +117,14 @@ const sendNotification = (organizers, requestor) => {
       ${formatName(requestor)} has requested to join your event.\n
       Please login to Let's Go app and accept or reject the request.`
     }
-    transporter.sendMail(mailOptions).then(result => {
-      return res.status(200).send(constructSuccess(`A verification email has been sent to ${organizer.email}.`))
-    }).catch(err => {
-      console.log('email error:', err)
-      next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
-    })
+    if (organizer.email) {
+      transporter.sendMail(mailOptions).then(result => {
+        return res.status(200).send(constructSuccess(`A verification email has been sent to ${organizer.email}.`))
+      }).catch(err => {
+        console.log('email error:', err)
+        next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
+      })
+    }
   })
 }
 
@@ -129,6 +133,7 @@ const sendNotification = (organizers, requestor) => {
 router.post('/request/:event_id', (req, res, next) => {
   const userEventService = new UserEventService()
   const eventService = new EventService()
+  console.log('post', req.params, req.user)
   const record = {
     event_id: req.params.event_id,
     requested_by: req.user.id,
@@ -137,7 +142,7 @@ router.post('/request/:event_id', (req, res, next) => {
   userEventService.insert(record)
     .then((row) => {
       res.json(row)
-      eventService.getEventOrganizers(row.event_id)
+      userEventService.getEventOrganizers(row.event_id)
         .then((organizers) => {
           // send email to the organizer that a person has requested to join the event.
           sendNotification(organizers, req.user)

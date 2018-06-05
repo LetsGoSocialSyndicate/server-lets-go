@@ -4,7 +4,7 @@
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { userTable, eventTable, userEventTable } = require('./constants')
+const { userTable, eventTable, userEventTable, USER_EVENT_FIELDS } = require('./constants')
 
 class UserEventService {
   getAllEventsByParticipant(userId) {
@@ -13,8 +13,8 @@ class UserEventService {
     }
     return knex(userTable)
       .select('*')
-      .leftJoin(userEventTable, `${userEventTable}.requested_by`, `${userTable}.id`)
-      .leftJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.requested_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
       .then((rows) => {
         if (rows.length > 0) {
@@ -34,8 +34,8 @@ class UserEventService {
     }
     return knex(userTable)
       .select('*')
-      .leftJoin(userEventTable, `${userEventTable}.created_by`, `${userTable}.id`)
-      .leftJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.created_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
       .then((rows) => {
         if (rows.length > 0) {
@@ -54,9 +54,9 @@ class UserEventService {
       throw boom.badRequest('Event id is required')
     }
     return knex(eventTable)
-      .select('*')
-      .leftJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
-      .leftJoin(userEventTable, `${userEventTable}.created_by`, `${userTable}.id`)
+      .select(USER_EVENT_FIELDS)
+      .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .innerJoin(userTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
       .then((rows) => {
         if (rows.length > 0) {
@@ -100,10 +100,6 @@ class UserEventService {
     if (!record.event_id) {
       throw boom.badRequest('Event id is required')
     }
-    if (!record.posted_by) {
-      throw boom.badRequest('Event organizer id is required')
-    }
-
     return knex(userEventTable)
       .returning('*')
       .insert({
