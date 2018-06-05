@@ -13,6 +13,7 @@ exports.up = (knex, Promise) => {
     table.text('description').notNullable().defaultTo('')
     table.dateTime('start_time').notNullable().defaultTo(knex.raw('now()'))
     table.dateTime('end_time').notNullable().defaultTo(knex.raw('now()'))
+    table.timestamps(true, true)
   })
     .then(() => {
       return knex.schema.alterTable(eventTable, (table) => {

@@ -10,10 +10,10 @@ exports.up = (knex, Promise) => {
     table.uuid('event_id').notNullable()
     table.foreign('event_id').references('id').inTable(eventTable).onDelete('cascade')
 
-    // who created the event, i.e. event organizer(s)
-    table.uuid('created_by')
-    table.foreign('created_by').references('id').inTable(userTable).onDelete('cascade')
-    table.dateTime('created_at')
+    // who posted the event, i.e. event organizer(s)
+    table.uuid('posted_by')
+    table.foreign('posted_by').references('id').inTable(userTable).onDelete('cascade')
+    table.dateTime('posted_at')
 
     // who requested to join the event, i.e. event participants
     table.uuid('requested_by')
@@ -40,6 +40,7 @@ exports.up = (knex, Promise) => {
     // Number 1 through 5
     table.integer('creator_requestor_rating').notNullable().defaultTo(0)
     table.dateTime('creator_requestor_rated_at')
+    table.timestamps(true, true)
   })
     .then(() => {
       return knex.schema.alterTable(userEventTable, (table) => {
