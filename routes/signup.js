@@ -21,7 +21,7 @@ const verifyUserNotInDatabase = (userService, username) => {
     throw boom.badRequest(
       'The username you have entered is already ' +
       'associated with another account.', {
-      errorType: result.is_verified
+      errorType: result.verified_at
         ? ALREADY_EXISTS
         : ALREADY_EXISTS_UNVERIFIED
     })
@@ -67,7 +67,7 @@ router.post('/', (req, res, next) => {
       last_name: lastName,
       username: username,
       email: email,
-      is_verified: false,
+      verified_at: null,
       hashed_password: bcrypt.hashSync(password, 8),
       gender: gender,
       birthday: birthday

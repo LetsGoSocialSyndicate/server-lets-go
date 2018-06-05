@@ -52,9 +52,7 @@ class EventService {
 
     return knex(eventTable)
       .returning('*')
-      .insert({
-        id: uuid()
-      })
+      .insert({ ...event, id: uuid() })
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]

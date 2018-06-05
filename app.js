@@ -7,6 +7,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const { verifyToken } = require('./utilities/jwtUtil')
+const { retrieveUser } = require('./utilities/dbUtils')
 const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
@@ -41,20 +42,20 @@ app.use((req, res, next) => {
   }
 })
 
-//View engine setup
+// View engine setup
 app.engine('handlebars', exphbs())
 app.set('view engine', 'handlebars')
 
-//Body parser Middleware
+// Body parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-//Static folder
+// Static folder
 app.use('/public', express.static(path.join(__dirname, 'public')))
 
 app.use('/login', loginRouter)
 app.use('/signup', signupRouter)
-app.use('/events', verifyToken, eventsRouter)
+app.use('/events', verifyToken, retrieveUser, eventsRouter)
 app.use('/users', verifyToken, usersRouter)
 app.use('/confirmation', confirmationRouter)
 
@@ -65,7 +66,7 @@ app.use((req, res, next) => {
 
 // error handler
 app.use((err, req, res, next) => {
-  console.log("all-catch err:", err)
+  console.log('all-catch err: ', err)
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}

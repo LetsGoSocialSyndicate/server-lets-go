@@ -75,6 +75,35 @@ class UserEventService {
       throw boom.badRequest('Event id is required')
     }
   }
+
+  insert(record) {
+    if (!record.event_id) {
+      throw boom.badRequest('Event id is required')
+    }
+    if (!record.posted_by) {
+      throw boom.badRequest('Event organizer id is required')
+    }
+
+    return knex(userEventTable)
+      .returning('*')
+      .insert({
+        ...record,
+        id: uuid()
+      })
+      .then((rows) => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many user-event record for the id, ${rows[0].id}`)
+        }
+        throw boom.badImplementation(`Unable to insert user-event record`)
+      })
+      .catch((err) => {
+        console.log(err)
+        throw err.isBoom ? err : boom.badImplementation(`Error inserting user-event record`)
+      })
+  }
 }
 
 module.exports = UserEventService

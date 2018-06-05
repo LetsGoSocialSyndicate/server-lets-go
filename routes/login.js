@@ -20,7 +20,7 @@ router.post('/', (req, res, next) => {
     userService.getByUsername(username)
       .then((result) => {
         if (bcrypt.compareSync(password, result.hashed_password)) {
-          if (result.is_verified) {
+          if (result.verified_at) {
             const payload = { username, userId: result.id }
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
             res.status(200).json({ token })

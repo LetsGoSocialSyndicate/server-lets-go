@@ -6,11 +6,10 @@ const router = express.Router()
 const { constructFailure, invalidInput } = require('../utilities/routeUtil')
 const EventService = require('../database/services/eventService')
 const UserEventService = require('../database/services/userEventService')
-const eventService = new EventService()
-const userEventService = new UserEventService()
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
+  const eventService = new EventService()
   eventService.getList()
     .then((rows) => {
       res.json(rows)
@@ -19,6 +18,7 @@ router.get('/', (req, res, next) => {
 })
 
 router.get('/:id', (req, res, next) => {
+  const eventService = new EventService()
   const { id } = req.params
   eventService.get(id)
     .then((row) => {
@@ -28,6 +28,8 @@ router.get('/:id', (req, res, next) => {
 })
 
 router.post('/', (req, res, next) => {
+  const eventService = new EventService()
+  const userEventService = new UserEventService()
   const {
     title,
     location,
@@ -40,9 +42,29 @@ router.post('/', (req, res, next) => {
   if (!title) {
     next(invalidInput('The event title may not be blank'))
   }
+  eventService.insert({
+    title,
+    location,
+    icon_url,
+    category,
+    description,
+    start_time,
+    end_time
+  })
+    .then((row) => {
+      const record = {
+        event_id: row.id,
+        posted_by: req.user.id,
+        posted_at: new Date()
+      }
+      userEventService.insert(record)
+      res.json(row)
+    })
+    .catch((err) => next(err))
 })
 
 router.patch('/:id', (req, res, next) => {
+  const eventService = new EventService()
   const { id } = req.params
   const {
     title,
@@ -59,6 +81,7 @@ router.patch('/:id', (req, res, next) => {
 })
 
 router.delete('/:id', (req, res, next) => {
+  const eventService = new EventService()
   const { id } = req.params
   eventService.delete(id)
     .then((row) => res.json(row))

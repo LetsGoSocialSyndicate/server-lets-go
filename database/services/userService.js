@@ -71,7 +71,6 @@ class UserService {
     return knex(userTable)
       .where('email', email)
       .then((rows) => {
-        console.log('getByEmail rows', rows)
         if (rows.length === 1) {
           return rows[0]
         }
@@ -96,19 +95,20 @@ class UserService {
     return knex(userTable)
       .returning('*')
       .insert({
+        ...user,
         id: uuid(),
-        first_name: user.first_name,
-        middle_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        username: user.username,
-        hashed_password: user.hashed_password,
-        gender: user.gender,
-        image: user.image,
-        about: user.about,
-        is_verified: user.is_verified,
-        birthday: user.birthday,
-        avg_speed_min: user.avg_speed_min,
+        // first_name: user.first_name,
+        // middle_name: user.first_name,
+        // last_name: user.last_name,
+        // email: user.email,
+        // username: user.username,
+        // hashed_password: user.hashed_password,
+        // gender: user.gender,
+        // image: user.image,
+        // about: user.about,
+        // verified_at: user.verified_at,
+        // birthday: user.birthday,
+        // avg_speed_min: user.avg_speed_min,
         university_id: UUID_UNIVERSITY_OF_COLORADO
       })
       .then((rows) => {
@@ -144,7 +144,7 @@ class UserService {
         gender: user.gender,
         image: user.image,
         about: user.about,
-        is_verified: user.is_verified
+        verified_at: user.verified_at
         // Not sure, if we let them update university_id
       })
       .returning('*')

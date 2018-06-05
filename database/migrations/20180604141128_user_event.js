@@ -13,7 +13,7 @@ exports.up = (knex, Promise) => {
     // who posted the event, i.e. event organizer(s)
     table.uuid('posted_by')
     table.foreign('posted_by').references('id').inTable(userTable).onDelete('cascade')
-    table.dateTime('posted_at')
+    table.dateTime('posted_at').notNullable().defaultTo(knex.raw('now()'))
 
     // who requested to join the event, i.e. event participants
     table.uuid('requested_by')

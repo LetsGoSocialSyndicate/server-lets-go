@@ -36,7 +36,7 @@ router.get('/:token', (req, res, next) => {
           return res.status(401).send(constructFailure(ALREADY_VERIFIED, 'Account already verified.'))
         })
       }
-      result.verified_at = Date.now()
+      result.verified_at = new Date()
       userService.update(result).then(result => {
         tokenService.delete(token).then(result => {
           return res.status(200).send('Account successfully verified.')

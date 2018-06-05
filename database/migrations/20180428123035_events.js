@@ -7,7 +7,7 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable(eventTable, (table) => {
     table.uuid('id')
     table.string('title', 255).notNullable()
-    table.string('location', 255).notNullable().defaultTo('')
+    table.string('location', 255).notNullable()
     table.string('icon_url', 255).notNullable().defaultTo('')
     table.string('category', 255).notNullable().defaultTo('')
     table.text('description').notNullable().defaultTo('')
