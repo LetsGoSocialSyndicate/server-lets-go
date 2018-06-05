@@ -124,6 +124,28 @@ class UserEventService {
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user-event record`)
       })
   }
+
+  update(record) {
+    if (!record.id) {
+      throw boom.badRequest('User-Event record id is required')
+    }
+    return knex(userEventTable)
+      .returning('*')
+      .update(record)
+      .then((rows) => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many user-event record for the id, ${rows[0].id}`)
+        }
+        throw boom.badImplementation(`Unable to update user-event record`)
+      })
+      .catch((err) => {
+        console.log(err)
+        throw err.isBoom ? err : boom.badImplementation(`Error updating user-event record`)
+      })
+  }
 }
 
 module.exports = UserEventService
