@@ -8,10 +8,14 @@
    return {errorType: errorType, message: msg}
  }
 
+ const constructSuccess = (msg) => {
+   console.log("SUCCESS:", {message: msg})
+   return {message: msg}
+ }
  const invalidInput = (res, msg) => {
    return res.status(400).send(constructFailure(INVALID_INPUT, msg))
  }
 
  module.exports = {
-   constructFailure, invalidInput
+   constructFailure, constructSuccess, invalidInput
  }

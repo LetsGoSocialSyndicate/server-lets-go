@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userServices')
 const TokenService = require('../database/services/tokenService')
 const {ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, DATABASE_ERROR, SENDING_MAIL_ERROR} = require('../utilities/constants')
-const {constructFailure, invalidInput} = require('../utilities/routeUtil')
+const {constructFailure, constructSuccess, invalidInput} = require('../utilities/routeUtil')
 
 const verifyUserNotInDatabase = (userService, username) => {
   return userService.getByUsername(username).then(result => {
@@ -97,8 +97,9 @@ router.post('/', (req, res, next) => {
               'http:\/\/' + req.headers.host + '\/confirmation\/' + tokenEntry.token + '.\n'
       }
       transporter.sendMail(mailOptions).then(result => {
-        return res.status(200).send('A verification email has been sent to ' + email + '.')
+        return res.status(200).send(constructSuccess('A verification email has been sent to ' + email + '.'))
       }).catch(err => {
+        console.log("email error:", err)
         return res.status(500).send(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email'))
       })
     })
