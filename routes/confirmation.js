@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
 const {constructFailure, invalidInput} = require('../utilities/routeUtil')
-const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('./routesConstants')
+const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('../utilities/routesConstants')
 
 const ONE_DAY = 1000 * 3600 * 24
 

@@ -1,14 +1,16 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
- const  constructFailure = (errorType, msg) => {
-   return {errorType: errorType, message: msg}
- }
+const { INVALID_INPUT } = require('./routesConstants')
 
- const invalidInput = (msg) => {
-   return res.status(400).send(constructFailure(INVALID_INPUT, msg))
- }
+const  constructFailure = (errorType, msg, code) => {
+  return { errorType: errorType, message: msg, statusCode: code }
+}
 
- module.exports = {
-   constructFailure, invalidInput
- }
+const invalidInput = (msg) => {
+  return constructFailure(INVALID_INPUT, msg, 400)
+}
+
+module.exports = {
+  constructFailure, invalidInput
+}
