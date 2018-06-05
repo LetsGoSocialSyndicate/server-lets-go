@@ -11,12 +11,11 @@ exports.seed = (knex, Promise) => {
           first_name: 'Jane',
           middle_name: '',
           last_name: 'Doe',
-          username: 'jane',
           email: 'jane.doe@email.com',
           hashed_password: '$2b$10$uh0Y5nzAA80lZHQZEc6uzeeI5UDB.TPScJ/6T/OMdTSMzzGSSBPhm',
           gender: 'female',
-          is_verified: true,
-          birthday: '1999-01-01', 
+          verified_at: '1999-01-01',
+          birthday: '1999-01-01',
           university_id: UUID_UNIVERSITY_OF_COLORADO
         }
       ])

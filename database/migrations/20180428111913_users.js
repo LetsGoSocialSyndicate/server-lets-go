@@ -10,7 +10,7 @@ exports.up = (knex, Promise) => {
     table.varchar('middle_name', 255).notNullable().defaultTo('')
     table.varchar('last_name', 255).notNullable()
     table.varchar('email', 255).notNullable()
-    table.dateTime('verified_at').notNullable().defaultTo(knex.raw('now()'))
+    table.dateTime('verified_at').nullable()
     table.date('birthday').notNullable()
     table.specificType('hashed_password', 'CHAR(60)')
     // Gender is optional, but we will filter by gender
@@ -25,7 +25,7 @@ exports.up = (knex, Promise) => {
     .then(() => {
       return knex.schema.alterTable(userTable, (table) => {
         table.unique('id')
-        table.unique('username')
+        table.unique('email')
         // table.foreign('university_id').references('id').inTable(universityTable)
       })
     })

@@ -23,7 +23,7 @@ class UserService {
       })
   }
 
-  get(id) {
+  getById(id) {
     if (!id) {
       throw boom.badRequest('User id is required')
     }
@@ -43,52 +43,37 @@ class UserService {
       })
   }
 
-  getByUsername(username) {
-    if (!username) {
-      throw boom.badRequest('Username is required')
+  getByEmail(email) {
+    if (!email) {
+      throw boom.badRequest('Email is required')
     }
     return knex(userTable)
-      .where('username', username)
+      .where('email', email)
       .then((rows) => {
-        console.log("getByUsername rows", rows)
         if (rows.length === 1) {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many users for the username, ${username}`)
+          throw boom.badImplementation(`Too many users for the email, ${email}`)
         }
-        throw boom.notFound(`No users found for the username, ${username}`)
+        throw boom.notFound(`No users found for the email, ${email}`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by the username, ${username}`)
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by the email, ${email}`)
       })
   }
 
   insert(user) {
-    if (!user.username) {
-      throw boom.badRequest('Username name is required')
-    }
     if (!user.email) {
-      throw boom.badRequest('Email must not be blank')
+      throw boom.badRequest('Email is required')
     }
 
     return knex(userTable)
       .returning('*')
       .insert({
         id: uuid(),
-        first_name: user.first_name,
-        middle_name: user.middle_name,
-        last_name: user.last_name,
-        email: user.email,
-        username: user.username,
-        hashed_password: user.hashed_password,
-        gender: user.gender,
-        image: user.image,
-        about: user.about,
-        is_verified: user.is_verified,
-        birthday: user.birthday,
-        avg_speed_min: user.avg_speed_min,
-        university_id: UUID_UNIVERSITY_OF_COLORADO
+        university_id: UUID_UNIVERSITY_OF_COLORADO,
+        ...user
       })
       .then((rows) => {
         if (rows.length === 1) {
@@ -100,32 +85,23 @@ class UserService {
         throw boom.badImplementation(`Unable to insert user`)
       })
       .catch((err) => {
+        console.log("user insert error:", err)
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user`)
       })
   }
 
   update(user) {
-    if (!user.username) {
-      throw boom.badRequest('Username name is required')
-    }
     if (!user.email) {
-      throw boom.badRequest('Email must not be blank')
+      throw boom.badRequest('Email is required')
     }
-    // TODO: do I need to pass all fields here?
+    console.log("user update start:", user)
+
     return knex(userTable)
-      .where('username', user.username)
-      .update({
-        first_name: user.first_name,
-        middle_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        hashed_password: user.hashed_password,
-        gender: user.gender,
-        image: user.image,
-        about: user.about,
-        is_verified: user.is_verified
-        // Not sure, if we let them update university_id
-      })
+      .where('email', user.email)
+      // object keys === database keys
+      // If we do not want to update whole user, but only few fields,
+      // then we need to check that these fields present in user obj.
+      .update(user)
       .returning('*')
       .then((rows) => {
         console.log("update rows", rows)
@@ -138,6 +114,7 @@ class UserService {
         throw boom.badImplementation(`Unable to update user`)
       })
       .catch((err) => {
+        console.log("user update error:", err)
         throw err.isBoom ? err : boom.badImplementation(`Error updating user`)
       })
   }

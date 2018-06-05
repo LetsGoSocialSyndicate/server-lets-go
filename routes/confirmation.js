@@ -4,6 +4,7 @@ const router = express.Router()
 const knex = require('../knex')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const UserService = require('../database/services/userServices')
 const TokenService = require('../database/services/tokenService')
 const {constructFailure, invalidInput} = require('../utilities/routeUtil')
@@ -30,13 +31,13 @@ router.get('/:token', (req, res, next) => {
         return res.status(401).send(constructFailure(TOKEN_EXPIRED, 'The token has expired.'))
       })
     }
-    userService.getByUsername(result.username).then(result => {
-      if(result.is_verified) {
+    userService.getByEmail(result.email).then(result => {
+      if(result.verified_at) {
         tokenService.delete(token).then(result => {
           return res.status(401).send(constructFailure(ALREADY_VERIFIED, 'Account already verified.'))
         })
       }
-      result.is_verified = true
+      result.verified_at = moment().format('YYYY-MM-DD')
       userService.update(result).then(result => {
         tokenService.delete(token).then(result => {
           return res.status(200).send('Account successfully verified.')

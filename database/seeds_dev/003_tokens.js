@@ -6,8 +6,8 @@ exports.seed = function(knex, Promise) {
     .then(function() {
       // Inserts seed entries
       return knex(tokenTable).insert([
-        { 
-          username: 'username',
+        {
+          email: 'email',
           token: 'token'
         }
       ])

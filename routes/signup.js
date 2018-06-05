@@ -14,12 +14,12 @@ const TokenService = require('../database/services/tokenService')
 const {ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, DATABASE_ERROR, SENDING_MAIL_ERROR} = require('../utilities/constants')
 const {constructFailure, constructSuccess, invalidInput} = require('../utilities/routeUtil')
 
-const verifyUserNotInDatabase = (userService, username) => {
-  return userService.getByUsername(username).then(result => {
+const verifyUserNotInDatabase = (userService, email) => {
+  return userService.getByEmail(email).then(result => {
     throw boom.badRequest(
-      'The username you have entered is already ' +
+      'The email you have entered is already ' +
       'associated with another account.', {
-      errorType: result.is_verified
+      errorType: result.verified_at
         ? ALREADY_EXISTS
         : ALREADY_EXISTS_UNVERIFIED
     })
@@ -32,7 +32,6 @@ const verifyUserNotInDatabase = (userService, username) => {
 
 router.post('/', (req, res, next) => {
   const {
-    username,
     email,
     password,
     firstName,
@@ -41,9 +40,6 @@ router.post('/', (req, res, next) => {
     gender,
     birthday
   } = req.body
-  if (!username) {
-    return invalidInput(res, "Username cannot be blank")
-  }
   if (!birthday) {
     return invalidInput(res, "Birthday cannot be blank")
   }
@@ -57,15 +53,14 @@ router.post('/', (req, res, next) => {
   const userService = new UserService()
   const tokenService = new TokenService()
 
-  verifyUserNotInDatabase(userService, username).then(() => {
+  verifyUserNotInDatabase(userService, email).then(() => {
     // Create and save the user
+    // By default verified_at is null
     const user = {
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
-      username: username,
       email: email,
-      is_verified: false,
       hashed_password: bcrypt.hashSync(password, 8),
       gender: gender,
       birthday: birthday
@@ -73,7 +68,7 @@ router.post('/', (req, res, next) => {
     return userService.insert(user)
   }).then(result => {
     const tokenEntry = {
-      username: username,
+      email: email,
       token: crypto.randomBytes(128).toString('hex') //we will need 256 in migrations
     }
     // TODO: check if token exists and return error.

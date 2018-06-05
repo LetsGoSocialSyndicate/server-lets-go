@@ -26,18 +26,18 @@ class TokenService {
       })
   }
 
-  insert({token, username}) {
+  insert({token, email}) {
     if (!token) {
       throw boom.badRequest('Token is required')
     }
-    if (!username) {
-      throw boom.badRequest('Username is required')
+    if (!email) {
+      throw boom.badRequest('Email is required')
     }
 
     return knex(tokenTable)
       .returning('*')
       .insert({
-        username: username,
+        email: email,
         token: token
       })
       .then((rows) => {
@@ -53,6 +53,7 @@ class TokenService {
         throw err.isBoom ? err : boom.badImplementation(`Error inserting token`)
       })
   }
+
   delete(token) {
     if (!token) {
       throw boom.badRequest('Token is required.')
