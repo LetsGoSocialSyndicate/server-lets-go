@@ -3,10 +3,16 @@
  */
 const express = require('express')
 const router = express.Router()
+const EventService = require('../database/services/eventService')
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
-  res.send('respond with a resource')
+  const eventService = new EventService()
+  eventService.getList()
+    .then((rows) => {
+      console.log(rows)
+      res.json(rows)
+    })
 })
 
 router.get('/:id', (req, res, next) => {

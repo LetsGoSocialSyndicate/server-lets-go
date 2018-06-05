@@ -6,7 +6,7 @@ const router = express.Router()
 const knex = require('../knex')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const UserService = require('../database/services/userServices')
+const UserService = require('../database/services/userService')
 const { NOT_VERIFIED, BAD_PASSWORD, INVALID_INPUT } = require('./routesConstants')
 
 require('dotenv').config()
