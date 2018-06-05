@@ -76,6 +76,26 @@ class UserEventService {
     }
   }
 
+  get(id) {
+    if (!id) {
+      throw boom.badRequest('User-Event id is required')
+    }
+    return knex(userEventTable)
+      .where('id', id)
+      .then((rows) => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many user-event records for the id, ${id}`)
+        }
+        throw boom.notFound(`No user-event record found for the id, ${id}`)
+      })
+      .catch((err) => {
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user-event record with the id, ${id}`)
+      })
+  }
+
   insert(record) {
     if (!record.event_id) {
       throw boom.badRequest('Event id is required')
