@@ -1,10 +1,11 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { INVALID_INPUT } = require('./routesConstants')
+const {INVALID_INPUT} = require('./constants')
 
 const  constructFailure = (errorType, msg, code) => {
-  return { errorType: errorType, message: msg, statusCode: code }
+  console.log('ERROR:', {errorType: errorType, message: msg})
+  return {errorType: errorType, message: msg, statusCode: code}
 }
 
 const invalidInput = (msg) => {

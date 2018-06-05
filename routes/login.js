@@ -7,8 +7,8 @@ const knex = require('../knex')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userService')
-const { NOT_VERIFIED, BAD_PASSWORD, INVALID_INPUT } = require('../utilities/routesConstants')
-const { constructFailure, invalidInput } = require('../utilities/routeUtil')
+const { invalidInput } = require('../utilities/routeUtil')
+const { NOT_VERIFIED, BAD_PASSWORD } = require('../utilities/constants')
 
 require('dotenv').config()
 
