@@ -11,7 +11,7 @@ exports.up = (knex, Promise) => {
     table.foreign('event_id').references('id').inTable(eventTable).onDelete('cascade')
 
     // who created the event, i.e. event organizer(s)
-    table.uuid('created_by').notNullable()
+    table.uuid('created_by')
     table.foreign('created_by').references('id').inTable(userTable).onDelete('cascade')
     table.dateTime('created_at')
 
