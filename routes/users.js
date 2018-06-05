@@ -14,12 +14,7 @@ router.get('/', (req, res, next) => {
 })
 
 router.get('/:id', (req, res, next) => {
-<<<<<<< HEAD
-  const userService = new UserService()
-  userService.get(req.params.id)
-    .then((row) => res.json(row))
-    .catch((err) => next(err))
-=======
+
   console.log('In router GET uset bi ID:', req.params.id)
   const userService = new UserService()
   const { id } = req.params
@@ -32,7 +27,6 @@ router.get('/:id', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   res.send('respond with a resource')
->>>>>>> added stuff for userProfile by id
 })
 
 router.patch('/:id', (req, res, next) => {
