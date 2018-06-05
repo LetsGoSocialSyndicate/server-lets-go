@@ -3,6 +3,7 @@
  */
 const EMAIL_DOMAIN = 'gmail.com'
 
+//Errors returned by backend
 const NOT_VERIFIED = 'NOT_VERIFIED'
 const BAD_PASSWORD = 'BAD_PASSWORD'
 const INVALID_INPUT = 'INVALID_INPUT'

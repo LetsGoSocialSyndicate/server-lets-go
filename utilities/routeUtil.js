@@ -8,6 +8,7 @@ const  constructFailure = (errorType, msg, code) => {
   return {errorType: errorType, message: msg, statusCode: code}
 }
 
+<<<<<<< HEAD
 const invalidInput = (msg) => {
   return constructFailure(INVALID_INPUT, msg, 400)
 }
@@ -15,3 +16,16 @@ const invalidInput = (msg) => {
 module.exports = {
   constructFailure, invalidInput
 }
+=======
+ const constructSuccess = (msg) => {
+   console.log("SUCCESS:", {message: msg})
+   return {message: msg}
+ }
+ const invalidInput = (res, msg) => {
+   return res.status(400).send(constructFailure(INVALID_INPUT, msg))
+ }
+
+ module.exports = {
+   constructFailure, constructSuccess, invalidInput
+ }
+>>>>>>> signup route connected to frontend
