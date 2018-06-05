@@ -20,28 +20,33 @@ function noCaching(res) {
 //for Logged in request:
 function verifyToken(req, res, next) {
   console.log('verifyToken - cookies: ', req.cookies)
-  if (req.session.passport) {
-    console.log('verifyToken - session.passport: ', req.session.passport)
-    const decoded = { email: req.session.passport.user.email }
-    req.token = decoded
+  if (req.app.get('env') === 'development') {
     next()
   }
-  else if (req.cookies.token) {
-    const token = req.cookies.token
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-      if (err) {
-        console.log('jwt.verify err', err)
-        next(boom.unauthorized())
-      }
-      else {
-        console.log('decoded', decoded)
-        req.token = decoded
-        next()
-      }
-    })
-  }
   else {
-    return next(boom.unauthorized())
+    if (req.session.passport) {
+      console.log('verifyToken - session.passport: ', req.session.passport)
+      const decoded = { email: req.session.passport.user.email }
+      req.token = decoded
+      next()
+    }
+    else if (req.cookies.token) {
+      const token = req.cookies.token
+      jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+        if (err) {
+          console.log('jwt.verify err', err)
+          next(boom.unauthorized())
+        }
+        else {
+          console.log('decoded', decoded)
+          req.token = decoded
+          next()
+        }
+      })
+    }
+    else {
+      return next(boom.unauthorized())
+    }
   }
 }
 
