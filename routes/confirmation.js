@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
-const {constructFailure, invalidInput} = require('../utilities/routeUtil')
+const {constructFailure, constructSuccess, invalidInput} = require('../utilities/routeUtil')
 const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('../utilities/constants')
 
 const ONE_DAY = 1000 * 3600 * 24
@@ -43,7 +43,9 @@ router.get('/:token', (req, res, next) => {
       result.verified_at = moment().format('YYYY-MM-DD')
       userService.update(result).then(result => {
         tokenService.delete(token).then(result => {
-          return res.status(200).send('Account successfully verified.')
+          const payload = { email: result.email, userId: result.id }
+          const sessionToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
+          return res.status(200).send({email: result.email, token: sessionToken})
         })
       })
     })

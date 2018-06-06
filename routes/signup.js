@@ -54,6 +54,7 @@ const isOlderThan18 = (birthday) => {
 }
 
 router.post('/', (req, res, next) => {
+  console.log("HEADERS:", req.headers)
   const {
     email,
     password,
@@ -104,6 +105,7 @@ router.post('/', (req, res, next) => {
     }
     // TODO: check if token exists and return error.
     return tokenService.insert(tokenEntry).catch(err => {
+      //if we were unable to insert token, we delete user also.
       userService.delete(result.id)
       throw err
     }).then(result => {
@@ -115,12 +117,17 @@ router.post('/', (req, res, next) => {
           pass: process.env.LETS_GO_EMAIL_PASSWORD
         }
       })
+      // Server side host and below is Client side host.
+      // const host = 'http:\/\/' + req.headers.host
+      //now it goes not to localhost:8000, but to localhost:3000
+      const host = 'http:\/\/' + req.headers.origin
+
       const mailOptions = {
         from: 'letsgosyndicate@gmail.com',
         to: email,
         subject: 'Let\'s Go: Account Verification Token',
         text: 'Hello,\n\n' + 'Please verify your account by clicking the link:\n' +
-              'http:\/\/' + req.headers.host + '\/confirmation\/' + tokenEntry.token + '.\n'
+              host + '\/confirmation\/' + tokenEntry.token + '.\n'
       }
       transporter.sendMail(mailOptions).then(result => {
         return res.status(200).send(constructSuccess('A verification email has been sent to ' + email + '.'))

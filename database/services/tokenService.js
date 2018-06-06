@@ -17,12 +17,12 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many entries for the token, ${token}`)
+          throw boom.badImplementation(`Too many entries with same token`)
         }
-        throw boom.notFound(`Token ${token} not found`)
+        throw boom.notFound(`Token not found`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error retrieving token ${token}`)
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving token`)
       })
   }
 
@@ -45,7 +45,7 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many tokens, ${rows[0].token}`)
+          throw boom.badImplementation(`Too many entries with same token`)
         }
         throw boom.badImplementation(`Unable to insert token`)
       })
@@ -68,7 +68,7 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many tokens for the token, ${rows[0].token}`)
+          throw boom.badImplementation(`Too many entries with same token`)
         }
         throw boom.badImplementation(`Unable to delete token`)
       })

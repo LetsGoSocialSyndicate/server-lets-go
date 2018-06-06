@@ -23,7 +23,7 @@ router.post('/', (req, res, next) => {
           if (result.verified_at) {
             const payload = { email, userId: result.id }
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
-            res.status(200).json({ token })
+            res.status(200).json({ email, token })
           }
           else {
             next(constructFailure(NOT_VERIFIED, 'Your account has not been verified.', 401))
