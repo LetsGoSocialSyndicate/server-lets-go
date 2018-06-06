@@ -123,7 +123,6 @@ router.post('/', (req, res, next) => {
       // const host = 'http:\/\/' + req.headers.origin
       const host = req.headers.origin
 
-
       const mailOptions = {
         from: 'letsgosyndicate@gmail.com',
         to: email,

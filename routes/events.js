@@ -10,6 +10,10 @@ const { SENDING_MAIL_ERROR } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { formatName } = require('../utilities/miscUtils')
 
+const crypto = require('crypto')
+const UserService = require('../database/services/userService')
+const TokenService = require('../database/services/tokenService')
+
 /* GET event listing. */
 router.get('/', (req, res, next) => {
   const eventService = new UserEventService()
@@ -103,28 +107,46 @@ const sendNotification = (res, organizers, requestor) => {
     next(constructFailure(SENDING_MAIL_ERROR, 'No event organizers are available', 500))
     return
   }
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.LETS_GO_EMAIL,
-      pass: process.env.LETS_GO_EMAIL_PASSWORD
-    }
-  })
   // console.log('organizers', organizers)
   // console.log('requestor', requestor)
 
+  const userService = new UserService()
+  const tokenService = new TokenService()
+
   organizers.forEach((organizer) => {
+
+    const tokenEntry = {
+      email: organizer.email,
+      token: crypto.randomBytes(128).toString('hex')
+    }
+    return tokenService.insert(tokenEntry).catch(err => {
+      userService.delete(result.id)
+      throw err
+    }).then(result => {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.LETS_GO_EMAIL,
+          pass: process.env.LETS_GO_EMAIL_PASSWORD
+        }
+      })
+    })
+    const host = req.headers.origin
+
     const mailOptions = {
       from: process.env.LETS_GO_EMAIL,
       to: organizer.email,
       subject: `Let's Go: Join Request`,
       text: `Hello ${organizer.first_name},\n
       ${formatName(requestor)} has requested to join your event.\n
-      Please login to Let's Go app and accept or reject the request.`
+      Please login to Let's Go app and accept or reject the request.\n
+      link:\n
+        ${host}\/${tokenEntry.token}`
+      //add link for redirect here
     }
     if (organizer.email) {
       transporter.sendMail(mailOptions).then(result => {
-        return res.status(200).send(constructSuccess(`A verification email has been sent to ${organizer.email}.`))
+        return res.status(200).send(constructSuccess(`Your request has been sent.`))
       }).catch(err => {
         console.log('email error:', err)
         next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
@@ -149,6 +171,7 @@ router.post('/request/:event_id', (req, res, next) => {
       res.json(row)
       userEventService.getEventOrganizers(row.event_id)
         .then((organizers) => {
+          console.log('organizers', organizers)
           // send email to the organizer that a person has requested to join the event.
           sendNotification(res, organizers, req.user)
         })
