@@ -98,7 +98,7 @@ router.delete('/:id', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-const sendNotification = (organizers, requestor) => {
+const sendNotification = (res, organizers, requestor) => {
   if (!organizers || organizers.length === 0) {
     next(constructFailure(SENDING_MAIL_ERROR, 'No event organizers are available', 500))
     return
@@ -150,7 +150,7 @@ router.post('/request/:event_id', (req, res, next) => {
       userEventService.getEventOrganizers(row.event_id)
         .then((organizers) => {
           // send email to the organizer that a person has requested to join the event.
-          sendNotification(organizers, req.user)
+          sendNotification(res, organizers, req.user)
         })
     })
     .catch((err) => next(err))
