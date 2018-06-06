@@ -25,6 +25,30 @@ class UserEventService {
       })
   }
 
+  getEventById(user_event_id) {
+    if (!user_event_id) {
+      throw boom.badRequest('User-Event id is required')
+    }
+    return knex(userTable)
+      .select(USER_EVENT_FIELDS)
+      .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .where(`${userEventTable}.id`, user_event_id)
+      .then((rows) => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many user-event records for the id, ${user_event_id}`)
+        }
+        throw boom.notFound(`No user-event record found for the id, ${user_event_id}`)
+      })
+      .catch((err) => {
+        console.log('getAllEventsByParticipant: err', err)
+        throw boom.badImplementation(`Error retrieving events`)
+      })
+  }
+
   getAllEventsByParticipant(userId) {
     if (!userId) {
       throw boom.badRequest('User id is required')

@@ -61,7 +61,12 @@ router.post('/', (req, res, next) => {
         posted_by: req.user.id,
         posted_at: new Date()
       }
-      userEventService.insert(record)
+      return userEventService.insert(record)
+    })
+    .then((row) => {
+      return userEventService.getEventById(row.id)
+    })
+    .then((row) => {
       res.json(row)
     })
     .catch((err) => next(err))
