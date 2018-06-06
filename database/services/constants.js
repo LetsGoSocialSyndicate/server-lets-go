@@ -23,7 +23,15 @@ const USER_EVENT_FIELDS = [
   'events.id as event_id', 'events.title as event_title', 'events.location as event_location',
   'events.icon_url as event_icon_url', 'events.category as event_category',
   'events.description as event_description', 'events.start_time as event_start_time',
-  'events.end_time as event_end_time'
+  'events.end_time as event_end_time',
+  'user_event.posted_by as event_posted_by',
+  'user_event.posted_at as event_posted_at',
+  'user_event.requested_by as join_requested_by',
+  'user_event.requested_at as join_requested_at',
+  'user_event.first_viewed_by as join_request_first_viewed_by',
+  'user_event.first_viewed_at as join_request_first_viewed_at',
+  'user_event.accepted_at as join_request_accepted_at',
+  'user_event.rejected_at as join_request_rejected_at'
 ]
 
 module.exports = {
