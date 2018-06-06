@@ -120,7 +120,9 @@ router.post('/', (req, res, next) => {
       // Server side host and below is Client side host.
       // const host = 'http:\/\/' + req.headers.host
       //now it goes not to localhost:8000, but to localhost:3000
-      const host = 'http:\/\/' + req.headers.origin
+      // const host = 'http:\/\/' + req.headers.origin
+      const host = req.headers.origin
+
 
       const mailOptions = {
         from: 'letsgosyndicate@gmail.com',
