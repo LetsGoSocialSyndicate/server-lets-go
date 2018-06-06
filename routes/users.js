@@ -13,12 +13,11 @@ router.get('/', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.get('/:id', (req, res, next) => {
-
-  console.log('In router GET uset bi ID:', req.params.id)
+router.get('/:email', (req, res, next) => {
+  console.log('In router GET:', req.params.email)
   const userService = new UserService()
-  const { id } = req.params
-  userService.getById(id)
+  const { email } = req.params
+  userService.getByEmail(email)
     .then((row) => {
       res.json(row)
     })
@@ -29,11 +28,11 @@ router.post('/', (req, res, next) => {
   res.send('respond with a resource')
 })
 
-router.patch('/:id', (req, res, next) => {
+router.patch('/:email', (req, res, next) => {
   res.send('respond with a resource')
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:email', (req, res, next) => {
   res.send('respond with a resource')
 })
 
