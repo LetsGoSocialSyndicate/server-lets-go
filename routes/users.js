@@ -25,7 +25,7 @@ router.get('/:email', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.get('/requested', (req, res, next) => {
+router.get('/:email/requested', (req, res, next) => {
   console.log('In router GET: /users/requested', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByParticipant(req.user.id)
@@ -35,7 +35,7 @@ router.get('/requested', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.get('/hosted', (req, res, next) => {
+router.get('/:email/hosted', (req, res, next) => {
   console.log('In router GET: /users/hosted', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOrganizer(req.user.id)
