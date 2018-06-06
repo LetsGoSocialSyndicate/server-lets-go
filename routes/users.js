@@ -5,6 +5,8 @@ const express = require('express')
 const router = express.Router()
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
+const { verifyToken } = require('../utilities/jwtUtil')
+const { retrieveUser } = require('../utilities/dbUtils')
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -25,7 +27,7 @@ router.get('/:email', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.get('/:email/requested', (req, res, next) => {
+router.get('/:email/requested', verifyToken, retrieveUser, (req, res, next) => {
   console.log('In router GET: /users/requested', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByParticipant(req.user.id)
@@ -35,7 +37,7 @@ router.get('/:email/requested', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.get('/:email/hosted', (req, res, next) => {
+router.get('/:email/hosted', verifyToken, retrieveUser, (req, res, next) => {
   console.log('In router GET: /users/hosted', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOrganizer(req.user.id)
@@ -45,11 +47,11 @@ router.get('/:email/hosted', (req, res, next) => {
     .catch((err) => next(err))
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', verifyToken, retrieveUser, (req, res, next) => {
   res.send('respond with a resource')
 })
 
-router.patch('/:email', (req, res, next) => {
+router.patch('/:email', verifyToken, retrieveUser, (req, res, next) => {
   res.send('respond with a resource')
 })
 

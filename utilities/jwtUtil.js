@@ -19,29 +19,31 @@ function noCaching(res) {
 
 // for Logged in request:
 function verifyToken(req, res, next) {
-  console.log('verifyToken - cookies: ', req.cookies)
-  if (req.cookies.token) {
-    const token = req.cookies.token
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+  const { authorization } = req.headers
+  console.log('verifyToken - authorization: ', authorization)
+
+  try {
+    if (!authorization) {
+      throw new Error('Authorization header not found')
+    }
+    const authParsed = authorization.split(' ')
+    if (authParsed.length !== 2) {
+      throw new Error('Authorization header is corrupt')
+    }
+    jwt.verify(authParsed[1], process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
-        console.log('jwt.verify err', err)
-        next(boom.unauthorized())
+        throw new Error('JWT token is invalid')
       }
       else {
         console.log('decoded', decoded)
-        req.token = decoded
+        req.email = decoded.email
+        req.userId = decoded.userId
         next()
       }
     })
   }
-  else {
-    if (req.app.get('env') === 'development') {
-      req.token = { email: 'jane.doe@email.com' }
-      next()
-    }
-    else {
-      return next(boom.unauthorized())
-    }
+  catch (error) {
+    res.status(403).json({ error })
   }
 }
 

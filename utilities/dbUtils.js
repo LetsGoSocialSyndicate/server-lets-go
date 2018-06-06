@@ -6,8 +6,8 @@ const UserService = require('../database/services/userService')
 const userService = new UserService()
 
 function retrieveUser(req, res, next) {
-  if (req.token.email) {
-    userService.getByEmail(req.token.email)
+  if (req.email) {
+    userService.getByEmail(req.email)
       .then((user) => {
         req.user = user
         next()
