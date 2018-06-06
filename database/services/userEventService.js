@@ -12,6 +12,7 @@ class UserEventService {
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .orderBy(`${userEventTable}.posted_at`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
