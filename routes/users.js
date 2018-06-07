@@ -51,8 +51,15 @@ router.post('/', verifyToken, retrieveUser, (req, res, next) => {
   res.send('respond with a resource')
 })
 
-router.patch('/:email', verifyToken, retrieveUser, (req, res, next) => {
-  res.send('respond with a resource')
+router.patch('/:id', (req, res, next) => {
+  console.log('In router GET:', req.params.id)
+  const userService = new UserService()
+  const { id } = req.params
+  userService.getByEmail(id)
+    .then((row) => {
+      res.json(row)
+    })
+    .catch((err) => next(err))
 })
 
 router.delete('/:email', (req, res, next) => {
