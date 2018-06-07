@@ -66,6 +66,7 @@ class UserService {
       })
   }
 
+<<<<<<< HEAD
   getByEmail(email) {
     if (!email) {
       throw boom.badRequest('Email is required')
@@ -87,6 +88,8 @@ class UserService {
       })
   }
 
+=======
+>>>>>>> dddb162bb9e13db061fecf9beeac5f62339bbf10
   insert(user) {
     if (!user.email) {
       throw boom.badRequest('Email is required')
@@ -115,13 +118,18 @@ class UserService {
   }
 
   update(user) {
-    if (!user.email) {
-      throw boom.badRequest('Email is required')
+    let params = {}
+    if (user.id) {
+      params = {key: 'id', value: user.id}
+    } else if (user.email) {
+      params = {key: 'email', value: user.email}
+    } else {
+      throw boom.badRequest('Email or Id is required')
     }
     console.log("user update start:", user)
 
     return knex(userTable)
-      .where('email', user.email)
+      .where(params.key, params.value)
       // object keys === database keys
       // If we do not want to update whole user, but only few fields,
       // then we need to check that these fields present in user obj.
