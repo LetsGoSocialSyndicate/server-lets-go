@@ -144,7 +144,7 @@ const sendNotification = (res, organizers, req) => {
           text: `Hello ${organizer.first_name},\n
           ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
           Please login to Let's Go app and accept or reject the request.\n
-          link:\n${host}\/${tokenEntry.token}`
+          link:\n${host}\/requests\/${tokenEntry.token}`
         }
         if (organizer.email) {
           transporter.sendMail(mailOptions, (error, info) => {
