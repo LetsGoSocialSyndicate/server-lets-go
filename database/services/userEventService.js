@@ -65,7 +65,7 @@ class UserEventService {
         if (rows.length > 0) {
           return rows
         }
-        throw boom.notFound(`No events found`)
+        return []
       })
       .catch((err) => {
         console.log('getAllEventsByParticipant: err', err)
@@ -86,7 +86,7 @@ class UserEventService {
         if (rows.length > 0) {
           return rows
         }
-        throw boom.notFound(`No events found`)
+        return []
       })
       .catch((err) => {
         console.log('getAllEventsByParticipant: err', err)
@@ -107,7 +107,7 @@ class UserEventService {
         if (rows.length > 0) {
           return rows
         }
-        throw boom.notFound(`No events found`)
+        return []
       })
       .catch((err) => {
         console.log('getAllEventsByParticipant: err', err)
