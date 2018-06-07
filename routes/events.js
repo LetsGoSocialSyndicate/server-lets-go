@@ -143,14 +143,13 @@ const sendNotification = (res, organizers, req) => {
         to: organizer.email,
         subject: `Let's Go: Join Request`,
         text: `Hello ${organizer.first_name},\n
-        ${formatName(requestor)} has requested to join your event.\n
+        ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
         Please login to Let's Go app and accept or reject the request.\n
         link:\n
           ${host}\/${tokenEntry.token}`
         //add link for redirect here
       }
       if (organizer.email) {
-        console.log('am I here')
         transporter.sendMail(mailOptions).then(result => {
           return res.status(200).send(constructSuccess(`Your request has been sent.`))
         }).catch(err => {
