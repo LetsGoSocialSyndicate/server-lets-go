@@ -126,8 +126,7 @@ const sendNotification = (res, organizers, req) => {
         userService.delete(result.id)
         throw err
       })
-      .then((result) => result.token)
-      .then((token) => {
+      .then((result) => {
         const host = req.headers.origin
         const transporter = nodemailer.createTransport({
           service: 'gmail',
