@@ -13,11 +13,10 @@ router.get('/', (req, res, next) => {
   userService.getList().then((rows) => res.json(rows)).catch((err) => next(err))
 })
 
-router.get('/:email', (req, res, next) => {
-  console.log('In router GET:', req.params.email)
+router.get('/:id', (req, res, next) => {
+  console.log('In router GET /users/:id:', req.params.id)
   const userService = new UserService()
-  const {email} = req.params
-  userService.getByEmail(email).then((row) => {
+  userService.getById(req.params.id).then((row) => {
     res.json(row)
   }).catch((err) => next(err))
 })
@@ -42,9 +41,9 @@ router.post('/', (req, res, next) => {
   res.send('respond with a resource')
 })
 
-router.patch('/:id', verifyToken, (req, res, next) => {
-  //verify token middleware puts userId and email to request
-  console.log('users PATCH:', req.body, req.userId, req.email)
+router.patch('/:id', (req, res, next) => {
+  //verifyToken middleware puts userId and email to request
+  console.log('users PATCH:', req.params, req.userId, req.email, req.body)
   const userService = new UserService()
   if (req.userId != req.params.id) {
     next(boom.unauthorized("User ID does not match"))
