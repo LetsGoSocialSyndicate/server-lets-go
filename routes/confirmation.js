@@ -24,28 +24,28 @@ router.get('/:token', (req, res, next) => {
   const tokenService = new TokenService()
   const userService = new UserService()
 
-  tokenService.get(token).then(result => {
-    const created_at = new Date(result.created_at)
+  tokenService.get(token).then(resultTokenRecord => {
+    const created_at = new Date(resultTokenRecord.created_at)
     const tokenAge = Date.now() - created_at
     if (tokenAge > ONE_DAY) {
-      tokenService.delete(token).then(result => {
+      tokenService.delete(token).then(resultTokenDelete => {
         next(constructFailure(TOKEN_EXPIRED, 'The token has expired.', 401))
         return
       })
     }
-    userService.getByEmail(result.email).then(result => {
-      if(result.verified_at) {
-        tokenService.delete(token).then(result => {
+    userService.getByEmail(resultTokenRecord.email).then(resultUserRecord => {
+      if(resultUserRecord.verified_at) {
+        tokenService.delete(token).then(resultTokenDelete => {
           next(constructFailure(ALREADY_VERIFIED, 'Account already verified.', 401))
           return
         })
       }
-      result.verified_at = moment().format('YYYY-MM-DD')
-      userService.update(result).then(result => {
-        tokenService.delete(token).then(result => {
-          const payload = { email: result.email, userId: result.id }
+      resultUserRecord.verified_at = moment().format('YYYY-MM-DD')
+      userService.update(resultUserRecord).then(resultUserUpdate => {
+        tokenService.delete(token).then(resultTokenDelete => {
+          const payload = { email: resultUserUpdate.email, userId: resultUserUpdate.id }
           const sessionToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
-          return res.status(200).send({email: result.email, token: sessionToken})
+          return res.status(200).send({user: resultUserUpdate, token: sessionToken})
         })
       })
     })

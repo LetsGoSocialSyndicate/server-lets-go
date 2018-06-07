@@ -136,16 +136,16 @@ const sendNotification = (res, organizers, req) => {
           }
         })
 
-        const mailOptions = {
-          from: process.env.LETS_GO_EMAIL,
-          to: organizer.email,
-          subject: `Let's Go: Join Request`,
-          text: `Hello ${organizer.first_name},\n
-          ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
-          Please login to Let's Go app and accept or reject the request.\n
-          link:\n${host}\/requests\/${tokenEntry.token}`
-        }
         if (organizer.email) {
+          const mailOptions = {
+            from: process.env.LETS_GO_EMAIL,
+            to: organizer.email,
+            subject: `Let's Go: Join Request`,
+            text: `Hello ${organizer.first_name},\n
+            ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
+            Please login to Let's Go app and accept or reject the request.\n
+            link:\n${host}\/request\/verify\/${tokenEntry.token}`
+          }
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
               console.log('email error:', error)
