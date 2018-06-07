@@ -1,0 +1,6 @@
+// slledru@msn.com creating events
+curl -X POST -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsbGVkcnVAbXNuLmNvbSIsInVzZXJJZCI6IjM0NGQwOWI1LWE3YzYtNGI4NS04NjhhLTNiZjU1ODNjZGU2ZiIsImlhdCI6MTUyODIyNTkxMSwiZXhwIjoxNTI4MzEyMzExfQ.amcCEps7v2aDmAs_gJcIpnUSf-Adt8y1fkkbG59B3Kw' -H 'Content-Type: application/json' -d '{"title": "Bike around town", "location": "Boulder, CO"}'  http://localhost:8080/events/
+
+
+// slledru@gmail.com
+curl -X POST -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsbGVkcnVAZ21haWwuY29tIiwidXNlcklkIjoiMmRhZjU1MzAtMjZmMi00YTdhLTgxNGEtYmU1NDdlODE4YjNmIiwiaWF0IjoxNTI4MjI1OTgwLCJleHAiOjE1MjgzMTIzODB9.zET2xZFQcHAUp01QS0jdM4uxlxr53CakcbdK1-8KMgw' -H 'Content-Type: application/json' http://localhost:8080/events/request/aac0c11c-9549-41ff-bdf1-2d55225bbb84
