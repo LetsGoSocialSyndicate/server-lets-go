@@ -50,7 +50,7 @@ class UserService {
       throw boom.badRequest('Email is required')
     }
     return knex(userTable)
-      .select(USER_FIELDS)
+      .select('*')
       .where('email', email)
       .then((rows) => {
         if (rows.length === 1) {
@@ -66,30 +66,6 @@ class UserService {
       })
   }
 
-<<<<<<< HEAD
-  getByEmail(email) {
-    if (!email) {
-      throw boom.badRequest('Email is required')
-    }
-    return knex(userTable)
-      .select(USER_FIELDS)
-      .where('email', email)
-      .then((rows) => {
-        if (rows.length === 1) {
-          return rows[0]
-        }
-        if (rows.length > 1) {
-          throw boom.badImplementation(`Too many users for the email, ${email}`)
-        }
-        throw boom.notFound(`No users found for the email, ${email}`)
-      })
-      .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by email, ${email}`)
-      })
-  }
-
-=======
->>>>>>> dddb162bb9e13db061fecf9beeac5f62339bbf10
   insert(user) {
     if (!user.email) {
       throw boom.badRequest('Email is required')
