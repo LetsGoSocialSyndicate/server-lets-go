@@ -1,4 +1,4 @@
-const { UUID_UNIVERSITY_OF_COLORADO } = require('./constants')
+const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS } = require('./constants')
 
 /*
  * Copyright 2018, Socializing Syndicate Corp.
@@ -11,6 +11,7 @@ const { userTable } = require('./constants')
 class UserService {
   getList() {
     return knex(userTable)
+      .select(USER_FIELDS)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -28,6 +29,7 @@ class UserService {
       throw boom.badRequest('User id is required')
     }
     return knex(userTable)
+      .select(USER_FIELDS)
       .where('id', id)
       .then((rows) => {
         if (rows.length === 1) {
@@ -48,6 +50,7 @@ class UserService {
       throw boom.badRequest('Email is required')
     }
     return knex(userTable)
+      .select(USER_FIELDS)
       .where('email', email)
       .then((rows) => {
         if (rows.length === 1) {
@@ -68,6 +71,7 @@ class UserService {
       throw boom.badRequest('Email is required')
     }
     return knex(userTable)
+      .select(USER_FIELDS)
       .where('email', email)
       .then((rows) => {
         if (rows.length === 1) {
@@ -89,7 +93,7 @@ class UserService {
     }
 
     return knex(userTable)
-      .returning('*')
+      .returning(USER_FIELDS)
       .insert({
         ...user,
         id: uuid(),
@@ -122,7 +126,7 @@ class UserService {
       // If we do not want to update whole user, but only few fields,
       // then we need to check that these fields present in user obj.
       .update(user)
-      .returning('*')
+      .returning(USER_FIELDS)
       .then((rows) => {
         console.log("update rows", rows)
         if (rows.length === 1) {
@@ -147,7 +151,7 @@ class UserService {
     return knex(userTable)
       .where('id', id)
       .del()
-      .returning('*')
+      .returning(USER_FIELDS)
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]

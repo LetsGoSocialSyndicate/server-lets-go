@@ -56,10 +56,16 @@ const USER_EVENT_FULL_FIELDS = [
   'users2.last_name as organizer_last_name'
 ]
 
+const USER_FIELDS = [
+  'id', 'first_name', 'middle_name', 'last_name',
+  'email', 'role', 'verified_at', 'birthday',
+  'gender', 'image_url', 'about', 'university_id'
+]
+
 module.exports = {
   UUID_UNIVERSITY_OF_COLORADO,
   USER_ROLE_ADMIN, USER_ROLE_REGULAR,
-  USER_EVENT_FIELDS,
+  USER_EVENT_FIELDS, USER_FIELDS,
   USER_EVENT_FULL_FIELDS,
   universityTable,
   userTable, eventTable, tokenTable,
