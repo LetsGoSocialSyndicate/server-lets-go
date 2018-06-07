@@ -108,60 +108,60 @@ const sendNotification = (res, organizers, req) => {
     next(constructFailure(SENDING_MAIL_ERROR, 'No event organizers are available', 500))
     return
   }
-  console.log('organizers', organizers)
-  console.log('requestor', requestor)
-  console.log('sender', process.env.LETS_GO_EMAIL)
-  console.log('origin', req.headers.origin)
+  // console.log('organizers', organizers)
+  // console.log('requestor', requestor)
+  // console.log('sender', process.env.LETS_GO_EMAIL)
+  // console.log('origin', req.headers.origin)
 
   const userService = new UserService()
   const tokenService = new TokenService()
 
   organizers.forEach((organizer) => {
-    console.log('organier', organizer)
     const tokenEntry = {
       email: organizer.email,
       token: crypto.randomBytes(128).toString('hex')
     }
     return tokenService.insert(tokenEntry)
-    .catch(err => {
-      userService.delete(result.id)
-      throw err
-    })
-    .then(result => {
-      console.log('result', result)
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'letsgosyndicate@gmail.com',
-          pass: 'LetsGoTest1234'
+      .catch(err => {
+        userService.delete(result.id)
+        throw err
+      })
+      .then((result) => result.token)
+      .then((token) => {
+        const host = req.headers.origin
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.LETS_GO_EMAIL,
+            pass: process.env.LETS_GO_EMAIL_PASSWORD
+          }
+        })
+
+        const mailOptions = {
+          from: process.env.LETS_GO_EMAIL,
+          to: organizer.email,
+          subject: `Let's Go: Join Request`,
+          text: `Hello ${organizer.first_name},\n\n` +
+                formatName(requestor) + ' has requested to join your event.\n' +
+                'Please login to Let\'s Go app and accept or reject the request by clicking the link: \n' +
+                `${host}\\${token}.\n`
+        }
+        if (organizer.email) {
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.log('email error:', error)
+              next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
+              return
+            }
+            console.log('sendMailResult:', info)
+            res.status(200).send(constructSuccess(`Your request has been sent.`))
+            return
+          })
         }
       })
-      const host = req.headers.origin
-
-      const mailOptions = {
-        from: 'letsgosyndicate@gmail.com',
-        to: organizer.email,
-        subject: `Let's Go: Join Request`,
-        text: `Hello ${organizer.first_name},\n
-        ${formatName(requestor)} has requested to join your event.\n
-        Please login to Let's Go app and accept or reject the request.\n
-        link:\n
-          ${host}\/${tokenEntry.token}`
-        //add link for redirect here
-      }
-      if (organizer.email) {
-        console.log('am I here')
-        transporter.sendMail(mailOptions).then(result => {
-          return res.status(200).send(constructSuccess(`Your request has been sent.`))
-        }).catch(err => {
-          console.log('email error:', err)
-          next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
-        })
-      }
-    })
-    .catch((err) => {
-      console.log('err', err)
-    })
+      .catch((err) => {
+        console.log('general purpose err', err)
+      })
   })
 }
 
