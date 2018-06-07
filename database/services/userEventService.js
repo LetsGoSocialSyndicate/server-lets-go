@@ -56,10 +56,10 @@ class UserEventService {
       throw boom.badRequest('User id is required')
     }
     return knex(userTable)
-      .select(USER_EVENT_FULL_FIELDS)
+      .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.requested_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
-      .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
+      // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
       .then((rows) => {
         if (rows.length > 0) {
