@@ -79,7 +79,7 @@ class UserEventService {
     }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
-      .innerJoin(userEventTable, `${userEventTable}.created_by`, `${userTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
       .then((rows) => {
