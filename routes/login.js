@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
 const { invalidInput, constructFailure } = require('../utilities/routeUtil')
-const { NOT_VERIFIED, BAD_PASSWORD } = require('../utilities/constants')
+const { NOT_VERIFIED, BAD_EMAIL_OR_PASSWORD, DATABASE_ERROR } = require('../utilities/constants')
 
 require('dotenv').config()
 
@@ -33,9 +33,23 @@ router.post('/', (req, res, next) => {
           }
         }
         else {
-          next(constructFailure(BAD_PASSWORD, 'Bad password.', 401))
+          next(constructFailure(BAD_EMAIL_OR_PASSWORD, 'Bad email or password.', 401))
         }
-      })
+      }).catch((err) => {
+          console.log("login error:", err)
+          let status = 500
+          let payload = constructFailure(DATABASE_ERROR, 'Error while looking up user in database', status)
+          if (err.isBoom) {
+            const data = err.data ? err.data : {}
+            status = err.output.statusCode
+            if (status === 404) {
+              payload = constructFailure(BAD_EMAIL_OR_PASSWORD, 'Bad email or password.', 401)
+            } else {
+              payload = {...data, ...err.output.payload}
+            }
+          }
+          next(payload)
+        })
   }
   else {
     next(invalidInput('Username and/or password was not sent'))
