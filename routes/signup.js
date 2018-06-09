@@ -15,6 +15,7 @@ const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
   DATABASE_ERROR, SENDING_MAIL_ERROR } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { USER_ROLE_REGULAR } = require('../database/services/constants')
+const { sendEmail } = require('../utilities/mailUtils')
 
 const verifyUserNotInDatabase = (userService, email) => {
   return userService.getByEmail(email).then(result => {
@@ -98,56 +99,41 @@ router.post('/', (req, res, next) => {
       role: USER_ROLE_REGULAR
     }
     return userService.insert(user)
-  }).then(result => {
-    const tokenEntry = {
-      email: email,
-      token: crypto.randomBytes(128).toString('hex') //we will need 256 in migrations
-    }
-    // TODO: check if token exists and return error.
-    return tokenService.insert(tokenEntry).catch(err => {
-      //if we were unable to insert token, we delete user also.
-      userService.delete(result.id)
-      throw err
-    }).then(result => {
-      // Send the email
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.LETS_GO_EMAIL,
-          pass: process.env.LETS_GO_EMAIL_PASSWORD
-        }
-      })
-      // Server side host and below is Client side host.
-      // const host = 'http:\/\/' + req.headers.host
-      //now it goes not to localhost:8000, but to localhost:3000
-      // const host = 'http:\/\/' + req.headers.origin
-      const host = req.headers.origin
-
-      const mailOptions = {
-        from: 'letsgosyndicate@gmail.com',
-        to: email,
-        subject: 'Let\'s Go: Account Verification Token',
-        text: 'Hello,\n\n' + 'Please verify your account by clicking the link:\n' +
-              host + '\/confirmation\/' + tokenEntry.token + '.\n'
-      }
-      transporter.sendMail(mailOptions).then(result => {
-        return res.status(200).send(constructSuccess('A verification email has been sent to ' + email + '.'))
-      }).catch(err => {
-        console.log("email error:", err)
-        next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
-      })
-    })
-  }).catch((err) => {
-    console.log("signup error:", err)
-    let status = 500
-    let payload = constructFailure(DATABASE_ERROR, 'Error while inserting new user into database', status)
-    if (err.isBoom) {
-      const data = err.data ? err.data : {}
-      status = err.output.statusCode
-      payload =  {...data, ...err.output.payload}
-    }
-    next(payload)
   })
+    .then(result => {
+      const tokenEntry = {
+        email: email,
+        token: crypto.randomBytes(128).toString('hex') //we will need 256 in migrations
+      }
+      // TODO: check if token exists and return error.
+      return tokenService.insert(tokenEntry).catch(err => {
+        //if we were unable to insert token, we delete user also.
+        userService.delete(result.id)
+        throw err
+      })
+        .then(result => {
+          const host = req.headers.origin
+          return sendEmail(email, 'Let\'s Go: Account Verification Token',
+            'Hello,\n\n' + 'Please verify your account by clicking the link:\n' +
+                host + '\/confirmation\/' + tokenEntry.token + '.\n',
+            'A verification email has been sent to ' + email + '.',
+            'Error while sending verification email')
+        })
+        .then((result) => res.json(result))
+        .catch((err) => next(err))
+    })
+    .catch((err) => {
+      console.log("signup error:", err)
+      let status = 500
+      let payload = constructFailure(DATABASE_ERROR, 'Error while inserting new user into database', status)
+      if (err.isBoom) {
+        const data = err.data ? err.data : {}
+        status = err.output.statusCode
+        payload =  {...data, ...err.output.payload}
+      }
+
+      next(payload)
+    })
 })
 
 

@@ -3,12 +3,11 @@
  */
 const express = require('express')
 const router = express.Router()
-const nodemailer = require('nodemailer')
 const EventService = require('../database/services/eventService')
 const UserEventService = require('../database/services/userEventService')
 const { SENDING_MAIL_ERROR } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
-const { formatName } = require('../utilities/miscUtils')
+const { sendEmail } = require('../utilities/mailUtils')
 
 const crypto = require('crypto')
 const UserService = require('../database/services/userService')
@@ -116,7 +115,7 @@ const sendNotification = (res, organizers, req) => {
   const userService = new UserService()
   const tokenService = new TokenService()
 
-  organizers.forEach((organizer) => {
+  const emails = organizers.map((organizer) => {
     const tokenEntry = {
       email: organizer.email,
       token: crypto.randomBytes(128).toString('hex')
@@ -128,40 +127,24 @@ const sendNotification = (res, organizers, req) => {
       })
       .then((result) => {
         const host = req.headers.origin
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.LETS_GO_EMAIL,
-            pass: process.env.LETS_GO_EMAIL_PASSWORD
-          }
-        })
-
         if (organizer.email) {
-          const mailOptions = {
-            from: process.env.LETS_GO_EMAIL,
-            to: organizer.email,
-            subject: `Let's Go: Join Request`,
-            text: `Hello ${organizer.first_name},\n
+          return sendEmail(organizer.email, `Let's Go: Join Request`,
+            `Hello ${organizer.first_name},\n
             ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
             Please login to Let's Go app and accept or reject the request.\n
-            link:\n${host}\/request\/verify\/${tokenEntry.token}`
-          }
-          transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-              console.log('email error:', error)
-              next(constructFailure(SENDING_MAIL_ERROR, 'Error while sending verification email', 500))
-              return
-            }
-            console.log('sendMailResult:', info)
-            res.status(200).send(constructSuccess(`Your request has been sent.`))
-            return
-          })
+            link:\n${host}\/request\/verify\/${tokenEntry.token}`,
+            'Your request has been sent.', 'Error while sending join request email')
         }
       })
       .catch((err) => {
         console.log('general purpose err', err)
+        next(err)
+        return
       })
   })
+  Promise.all(emails)
+    .then((results) => results.forEach((result) => res.json(result)))
+    .catch((err) => next(err))
 }
 
 // user is requesting to participate in the event
