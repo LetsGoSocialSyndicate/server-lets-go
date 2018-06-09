@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 const nodemailer = require('nodemailer')
 const { EMAIL_PROVIDER, SENDING_MAIL_ERROR } = require('./constants')
 const { constructSuccess, constructFailure, invalidInput } = require('./routeUtil')
