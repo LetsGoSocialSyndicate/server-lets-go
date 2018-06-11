@@ -103,8 +103,9 @@ router.post('/', (req, res, next) => {
     .then(result => {
       const tokenEntry = {
         email: email,
-        token: crypto.randomBytes(128).toString('hex') //we will need 256 in migrations
+        token: crypto.randomBytes(4).toString('hex') //we will need 8 in migrations
       }
+      console.log(tokenEntry);
       // TODO: check if token exists and return error.
       return tokenService.insert(tokenEntry).catch(err => {
         //if we were unable to insert token, we delete user also.
@@ -113,10 +114,20 @@ router.post('/', (req, res, next) => {
       })
         .then(result => {
           const host = req.headers.origin
-          return sendEmail(email, 'Let\'s Go: Account Verification Token',
-            'Hello,\n\n' + 'Please verify your account by clicking the link:\n' +
-                host + '\/confirmation\/' + tokenEntry.token + '.\n',
-            'A verification email has been sent to ' + email + '.',
+          return sendEmail(email, 'Let\'s Go: Account Verification',
+            `<html>
+              <head>
+                <title>Let's Go: Account Verification</title>
+              </head>
+              <body>
+                <p>
+                  Hello,<br><br>
+                  Please enter the code below on the screen and press OK to continue.<br><br>
+                  The confirmation code is <b>${tokenEntry.token}</b>.<br>
+                </p>
+              </body>
+            </html>`,
+            'A verification code has been sent to ' + email + '.',
             'Error while sending verification email')
         })
         .then((result) => res.json(result))
@@ -135,6 +146,4 @@ router.post('/', (req, res, next) => {
       next(payload)
     })
 })
-
-
 module.exports = router

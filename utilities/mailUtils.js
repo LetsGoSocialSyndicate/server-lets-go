@@ -16,7 +16,8 @@ const sendEmail = (to, subject, text, confirmMessage, errorMessage) => {
 
   const mailOptions = {
     from: process.env.LETS_GO_EMAIL,
-    to, subject, text
+    to, subject,
+    html: text
   }
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
