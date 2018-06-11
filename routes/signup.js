@@ -12,10 +12,11 @@ const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
-  DATABASE_ERROR, SENDING_MAIL_ERROR } = require('../utilities/constants')
+  DATABASE_ERROR, SENDING_MAIL_ERROR, TOKEN_EXPIRED } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { USER_ROLE_REGULAR } = require('../database/services/constants')
 const { sendEmail } = require('../utilities/mailUtils')
+const { checkToken } = require('../utilities/dbUtils')
 
 const verifyUserNotInDatabase = (userService, email) => {
   return userService.getByEmail(email).then(result => {
@@ -146,4 +147,38 @@ router.post('/', (req, res, next) => {
       next(payload)
     })
 })
+
+router.patch('/:code', (req, res, next) => {
+  console.log("HEADERS:", req.headers)
+  const {
+    email
+  } = req.body
+  const {
+    code
+  } = req.params
+  if (!email) {
+    next(invalidInput("Email cannot be blank"))
+    return
+  }
+  console.log('email', email, 'code', code)
+  const userService = new UserService()
+  const tokenService = new TokenService()
+  checkToken(email, code)
+    .then((result) => {
+      tokenService.delete(code)
+      console.log('result', result)
+      res.status(200).send(result)
+    })
+    .catch((err) => {
+      console.log('err', err)
+      if (err.err === TOKEN_EXPIRED) {
+        tokenService.delete(code)
+        next(constructFailure(TOKEN_EXPIRED, 'The code has expired.', 401))
+      }
+      else {
+        next(err)
+      }
+    })
+})
+
 module.exports = router
