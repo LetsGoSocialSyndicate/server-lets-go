@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
-const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED,
+const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, PASSWORD_REGULAR_EXP,
   DATABASE_ERROR, SENDING_MAIL_ERROR, TOKEN_EXPIRED } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
 const { USER_ROLE_REGULAR } = require('../database/services/constants')
@@ -77,6 +77,12 @@ router.post('/', (req, res, next) => {
   if (!password) {
     next(invalidInput("Password cannot be blank"))
     return
+  }
+  if (process.env.PASSWORD_RULE !== 'DEVELOP') {
+    if (!password.match(PASSWORD_REGULAR_EXP)) {
+      next(invalidInput("Password must contain at least one upper case letter and at least one number, and must be at least 8 characters or more."))
+      return
+    }
   }
   if (!isOlderThan18(new Date(birthday))) {
     next(invalidInput("You must be 18 or older to signup"))
