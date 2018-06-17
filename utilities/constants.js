@@ -15,7 +15,9 @@ const TOKEN_EXPIRED = 'TOKEN_EXPIRED'
 const DATABASE_ERROR = 'DATABASE_ERROR'
 const SENDING_MAIL_ERROR = 'SENDING_MAIL_ERROR'
 
-const PASSWORD_REGULAR_EXP = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$'
+
+const PASSWORD_REGULAR_EXP = '(?=.*[A-Z])(?=.*[0-9])(?=.{8,})'
+//const PASSWORD_REGULAR_EXP = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$'
 
 module.exports = {
   EMAIL_DOMAIN, EMAIL_PROVIDER, NOT_VERIFIED,
