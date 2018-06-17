@@ -22,7 +22,7 @@ const sendEmail = (to, subject, text, confirmMessage, errorMessage) => {
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log('email error:', error)
+        console.log('email error:', mailOptions, error)
         reject(constructFailure(SENDING_MAIL_ERROR, errorMessage, 500))
       }
       console.log('sendMailResult:', info)

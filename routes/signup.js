@@ -110,7 +110,7 @@ router.post('/', (req, res, next) => {
     .then(result => {
       const tokenEntry = {
         email: email,
-        token: crypto.randomBytes(4).toString('hex') //we will need 8 in migrations
+        token: crypto.randomBytes(3).toString('hex') //we will need 6 in migrations
       }
       console.log(tokenEntry);
       // TODO: check if token exists and return error.
