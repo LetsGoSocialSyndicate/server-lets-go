@@ -44,7 +44,7 @@ function isTokenExpired(code) {
           resolved(record)
         }
       })
-      .catch((err) => rejected({ err: DATABASE_ERROR, detail: err }))
+      .catch((err) => rejected(err))
   })
 }
 
@@ -56,7 +56,6 @@ function checkToken(email, code) {
         const sessionToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
         return { user: userRecord, token: sessionToken }
       })
-        .catch((err) => ({ err: DATABASE_ERROR, detail: err }))
     })
 }
 

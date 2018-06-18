@@ -9,6 +9,7 @@ const boom = require('boom')
 const knex = require('../knex')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, PASSWORD_REGULAR_EXP,
@@ -120,7 +121,6 @@ router.post('/', (req, res, next) => {
         throw err
       })
         .then(result => {
-          const host = req.headers.origin
           return sendEmail(email, 'Let\'s Go: Account Verification',
             `<html>
               <head>
@@ -157,7 +157,8 @@ router.post('/', (req, res, next) => {
 router.patch('/:code', (req, res, next) => {
   console.log("HEADERS:", req.headers)
   const {
-    email
+    email,
+    password
   } = req.body
   const {
     code
@@ -170,20 +171,31 @@ router.patch('/:code', (req, res, next) => {
   const userService = new UserService()
   const tokenService = new TokenService()
   checkToken(email, code)
-    .then((result) => {
-      tokenService.delete(code)
-      console.log('result', result)
-      res.status(200).send(result)
+    .then((checkTokenResult) => {
+      const user = checkTokenResult.user
+      if (password) {
+        user.hashed_password = bcrypt.hashSync(password, 8)
+      }
+      if (!user.verified_at) {
+        user.verified_at = moment().format('YYYY-MM-DD')
+      }
+      userService.update(user).then(resultUserUpdate => {
+        tokenService.delete(code)
+        console.log('result', resultUserUpdate)
+        return res.status(200).send({user: user, token: checkTokenResult.token})
+      })
     })
     .catch((err) => {
-      console.log('err', err)
+      console.log("verify code error:", err)
+      let payload = constructFailure(DATABASE_ERROR, 'Error while inserting new user into database', 500)
       if (err.err === TOKEN_EXPIRED) {
         tokenService.delete(code)
-        next(constructFailure(TOKEN_EXPIRED, 'The code has expired.', 401))
+        payload = constructFailure(TOKEN_EXPIRED, 'The code has expired.', 401)
+      } else if (err.isBoom) {
+        const data = err.data ? err.data : {}
+        payload =  {...data, ...err.output.payload}
       }
-      else {
-        next(err)
-      }
+      next(payload)
     })
 })
 

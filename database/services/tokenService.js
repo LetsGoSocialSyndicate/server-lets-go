@@ -8,7 +8,7 @@ const { tokenTable } = require('./constants')
 class TokenService {
   get(token) {
     if (!token) {
-      throw boom.badRequest('Token is required')
+      throw boom.badRequest('Token/Code is required')
     }
     return knex(tokenTable)
       .where('token', token)
@@ -17,18 +17,18 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many entries with same token`)
+          throw boom.badImplementation(`Too many entries with same token/code`)
         }
-        throw boom.notFound(`Token not found`)
+        throw boom.notFound(`Token/Code not found`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error retrieving token`)
+        throw err.isBoom ? err : boom.badImplementation(`Error retrieving token/code`)
       })
   }
 
   insert({token, email}) {
     if (!token) {
-      throw boom.badRequest('Token is required')
+      throw boom.badRequest('Token/Code is required')
     }
     if (!email) {
       throw boom.badRequest('Email is required')
@@ -45,18 +45,18 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many entries with same token`)
+          throw boom.badImplementation(`Too many entries with same token/code`)
         }
-        throw boom.badImplementation(`Unable to insert token`)
+        throw boom.badImplementation(`Unable to insert token/code`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error inserting token`)
+        throw err.isBoom ? err : boom.badImplementation(`Error inserting token/code`)
       })
   }
 
   delete(token) {
     if (!token) {
-      throw boom.badRequest('Token is required.')
+      throw boom.badRequest('Token/Code is required.')
     }
 
     return knex(tokenTable)
@@ -68,12 +68,12 @@ class TokenService {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many entries with same token`)
+          throw boom.badImplementation(`Too many entries with same token/code`)
         }
-        throw boom.badImplementation(`Unable to delete token`)
+        throw boom.badImplementation(`Unable to delete token/code`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error deleting token`)
+        throw err.isBoom ? err : boom.badImplementation(`Error deleting token/code`)
       })
   }
 }
