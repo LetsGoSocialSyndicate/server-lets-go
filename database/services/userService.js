@@ -62,6 +62,7 @@ class UserService {
         throw boom.notFound(`No users found for the email, ${email}`)
       })
       .catch((err) => {
+        console.log("getByEmail:",err)
         throw err.isBoom ? err : boom.badImplementation(`Error retrieving user by the email, ${email}`)
       })
   }
