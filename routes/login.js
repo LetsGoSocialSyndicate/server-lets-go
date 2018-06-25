@@ -69,7 +69,7 @@ router.post('/', (req, res, next) => {
       next(payload)
     })
   } else {
-    next(invalidInput('Username and/or password was not sent'))
+    next(invalidInput('Username and/or password was not set'))
   }
   console.log("End of POST /login")
 })
