@@ -8,6 +8,7 @@ const universityTable = 'universities'
 const eventRatingTable = 'event_rating'
 const userRatingTable = 'user_rating'
 const userEventTable = 'user_event'
+const imageTable = 'images'
 
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
 
@@ -19,7 +20,7 @@ const USER_EVENT_FIELDS = [
   'users.last_name as last_name', 'users.email as email', 'users.role as user_role',
   'users.verified_at as user_verified_at', 'users.birthday as birthday',
   'users.hashed_password as hashed_password', 'users.gender as gender',
-  'users.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
+  'images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
   'events.id as event_id', 'events.title as event_title', 'events.location as event_location',
   'events.icon_url as event_icon_url', 'events.category as event_category',
   'events.description as event_description', 'events.start_time as event_start_time',
@@ -39,7 +40,7 @@ const USER_EVENT_FULL_FIELDS = [
   'users.last_name as last_name', 'users.email as email', 'users.role as user_role',
   'users.verified_at as user_verified_at', 'users.birthday as birthday',
   'users.hashed_password as hashed_password', 'users.gender as gender',
-  'users.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
+  'images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
   'events.id as event_id', 'events.title as event_title', 'events.location as event_location',
   'events.icon_url as event_icon_url', 'events.category as event_category',
   'events.description as event_description', 'events.start_time as event_start_time',
@@ -57,9 +58,11 @@ const USER_EVENT_FULL_FIELDS = [
 ]
 
 const USER_FIELDS = [
-  'id', 'first_name', 'middle_name', 'last_name',
-  'email', 'role', 'verified_at', 'birthday',
-  'gender', 'image_url', 'about', 'university_id'
+  'users.id as id', 'users.first_name as first_name', 'users.middle_name as middle_name',
+  'users.last_name as last_name', 'users.email as email', 'users.role as role',
+  'users.verified_at as verified_at', 'users.birthday as birthday',
+  'users.gender as gender', 'images.image_url as image_url',
+  'users.about as about', 'users.university_id as university_id'
 ]
 
 module.exports = {
@@ -68,6 +71,6 @@ module.exports = {
   USER_EVENT_FIELDS, USER_FIELDS,
   USER_EVENT_FULL_FIELDS,
   universityTable,
-  userTable, eventTable, tokenTable,
+  userTable, eventTable, tokenTable, imageTable,
   eventRatingTable, userRatingTable, userEventTable
 }
