@@ -52,8 +52,9 @@ class UserService {
       throw boom.badRequest('Email is required')
     }
     return knex(userTable)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
-      .select(USER_FIELDS_WITH_IMAGE)
+      // .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      // .select(USER_FIELDS_WITH_IMAGE)
+      .select(USER_FIELDS)
       .where(`${userTable}.email`, email)
       .then((rows) => {
         if (rows.length === 1) {

@@ -11,11 +11,12 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const UserService = require('../database/services/userService')
+const ImageService = require('../database/services/imageService')
 const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, PASSWORD_REGULAR_EXP,
   DATABASE_ERROR, SENDING_MAIL_ERROR, TOKEN_EXPIRED } = require('../utilities/constants')
 const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
-const { USER_ROLE_REGULAR } = require('../database/services/constants')
+const { USER_ROLE_REGULAR, DEFAULT_USER_PROFILE_IMAGE } = require('../database/services/constants')
 const { sendEmail } = require('../utilities/mailUtils')
 const { checkToken } = require('../utilities/dbUtils')
 
@@ -92,23 +93,26 @@ router.post('/', (req, res, next) => {
 
   const userService = new UserService()
   const tokenService = new TokenService()
+  const imageService = new ImageService()
 
+  // Create and save the user
+  // By default verified_at is null
+  const user = {
+    first_name: firstName,
+    middle_name: middleName,
+    last_name: lastName,
+    email: email,
+    hashed_password: bcrypt.hashSync(password, 8),
+    gender: gender,
+    birthday: birthday,
+    role: USER_ROLE_REGULAR
+  }
   verifyUserNotInDatabase(userService, email).then(() => {
-    // Create and save the user
-    // By default verified_at is null
-    const user = {
-      first_name: firstName,
-      middle_name: middleName,
-      last_name: lastName,
-      email: email,
-      hashed_password: bcrypt.hashSync(password, 8),
-      gender: gender,
-      birthday: birthday,
-      role: USER_ROLE_REGULAR
-    }
     return userService.insert(user)
   })
     .then(result => {
+      user.id = result.id
+      console.log('user', user)
       const tokenEntry = {
         email: email,
         token: crypto.randomBytes(3).toString('hex') //we will need 6 in migrations
@@ -121,6 +125,10 @@ router.post('/', (req, res, next) => {
         throw err
       })
         .then(result => {
+          console.log('result', result)
+          console.log('result', result)
+          imageService.insertUserProfileImage(user, DEFAULT_USER_PROFILE_IMAGE)
+
           return sendEmail(email, 'Let\'s Go: Account Verification',
             `<html>
               <head>
