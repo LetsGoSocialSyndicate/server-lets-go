@@ -11,6 +11,7 @@ const userEventTable = 'user_event'
 const imageTable = 'images'
 
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
+const DEFAULT_USER_PROFILE_IMAGE = 'http://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
 
 const USER_ROLE_ADMIN = 'admin'
 const USER_ROLE_REGULAR = 'regular'
@@ -57,7 +58,7 @@ const USER_EVENT_FULL_FIELDS = [
   'users2.last_name as organizer_last_name'
 ]
 
-const USER_FIELDS = [
+const USER_FIELDS_WITH_IMAGE = [
   'users.id as id', 'users.first_name as first_name', 'users.middle_name as middle_name',
   'users.last_name as last_name', 'users.email as email', 'users.role as role',
   'users.verified_at as verified_at', 'users.birthday as birthday',
@@ -65,11 +66,19 @@ const USER_FIELDS = [
   'users.about as about', 'users.university_id as university_id'
 ]
 
+const USER_FIELDS = [
+  'users.id as id', 'users.first_name as first_name', 'users.middle_name as middle_name',
+  'users.last_name as last_name', 'users.email as email', 'users.role as role',
+  'users.verified_at as verified_at', 'users.birthday as birthday',
+  'users.gender as gender', 'users.about as about', 'users.university_id as university_id'
+]
+
 module.exports = {
   UUID_UNIVERSITY_OF_COLORADO,
   USER_ROLE_ADMIN, USER_ROLE_REGULAR,
   USER_EVENT_FIELDS, USER_FIELDS,
-  USER_EVENT_FULL_FIELDS,
+  USER_EVENT_FULL_FIELDS, USER_FIELDS_WITH_IMAGE,
+  DEFAULT_USER_PROFILE_IMAGE,
   universityTable,
   userTable, eventTable, tokenTable, imageTable,
   eventRatingTable, userRatingTable, userEventTable

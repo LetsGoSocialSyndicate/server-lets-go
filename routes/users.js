@@ -10,7 +10,9 @@ const {retrieveUser} = require('../utilities/dbUtils')
 /* GET users listing. */
 router.get('/', (req, res, next) => {
   const userService = new UserService()
-  userService.getList().then((rows) => res.json(rows)).catch((err) => next(err))
+  userService.getList()
+    .then((rows) => res.json(rows))
+    .catch((err) => next(err))
 })
 
 router.get('/:id', (req, res, next) => {

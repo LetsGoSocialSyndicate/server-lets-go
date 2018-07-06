@@ -8,7 +8,7 @@ exports.up = (knex, Promise) => {
     table.uuid('id')
     table.text('image_url').notNullable().defaultTo('')
 
-    table.uuid('event_id').notNullable()
+    table.uuid('event_id')
     table.foreign('event_id').references('id').inTable(eventTable).onDelete('cascade')
 
     table.uuid('user_id')

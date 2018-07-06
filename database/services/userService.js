@@ -1,4 +1,4 @@
-const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS } = require('./constants')
+const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS, USER_FIELDS_WITH_IMAGE } = require('./constants')
 
 /*
  * Copyright 2018, Socializing Syndicate Corp.
@@ -6,12 +6,13 @@ const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS } = require('./constants')
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { userTable } = require('./constants')
+const { userTable, imageTable } = require('./constants')
 
 class UserService {
   getList() {
     return knex(userTable)
-      .select(USER_FIELDS)
+      .select(USER_FIELDS_WITH_IMAGE)
+      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -29,8 +30,9 @@ class UserService {
       throw boom.badRequest('User id is required')
     }
     return knex(userTable)
-      .select(USER_FIELDS)
-      .where('id', id)
+      .select(USER_FIELDS_WITH_IMAGE)
+      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .where(`${userTable}.id`, id)
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]
@@ -50,8 +52,9 @@ class UserService {
       throw boom.badRequest('Email is required')
     }
     return knex(userTable)
-      .select('*')
-      .where('email', email)
+      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .select(USER_FIELDS_WITH_IMAGE)
+      .where(`${userTable}.email`, email)
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]

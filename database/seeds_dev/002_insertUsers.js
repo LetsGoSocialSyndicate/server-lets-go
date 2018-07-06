@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 const { UUID_UNIVERSITY_OF_COLORADO, USER_ROLE_ADMIN, USER_ROLE_REGULAR, userTable } = require('../services/constants')
 
 exports.seed = (knex, Promise) => {

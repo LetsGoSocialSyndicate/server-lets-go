@@ -1,3 +1,6 @@
+/*
+ * Copyright 2018, Socializing Syndicate Corp.
+ */
 const { UUID_UNIVERSITY_OF_COLORADO, universityTable } = require('../services/constants')
 
 exports.seed = (knex, Promise) => {
