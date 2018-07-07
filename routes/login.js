@@ -34,6 +34,7 @@ router.post('/', (req, res, next) => {
   if (email && password) {
     const userService = new UserService()
     userService.getByEmail(email).then((result) => {
+      console.log(result)
       if (bcrypt.compareSync(password, result.hashed_password)) {
         if (result.verified_at) {
           const payload = {

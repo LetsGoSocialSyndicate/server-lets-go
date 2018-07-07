@@ -67,10 +67,9 @@ const USER_FIELDS_WITH_IMAGE = [
 ]
 
 const USER_FIELDS = [
-  'users.id as id', 'users.first_name as first_name', 'users.middle_name as middle_name',
-  'users.last_name as last_name', 'users.email as email', 'users.role as role',
-  'users.verified_at as verified_at', 'users.birthday as birthday',
-  'users.gender as gender', 'users.about as about', 'users.university_id as university_id'
+  'id', 'first_name', 'middle_name',
+  'last_name', 'email', 'role', 'hashed_password',
+  'verified_at', 'birthday', 'gender', 'about', 'university_id'
 ]
 
 module.exports = {
