@@ -17,7 +17,6 @@ exports.up = (knex, Promise) => {
     table.specificType('hashed_password', 'CHAR(60)')
     // Gender is optional, but we will filter by gender
     table.varchar('gender', 255).notNullable().defaultTo('')
-
     table.text('about').notNullable().defaultTo('Describe yourself here...')
 
     table.uuid('university_id').notNullable()

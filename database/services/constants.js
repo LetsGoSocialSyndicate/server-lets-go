@@ -11,7 +11,7 @@ const userEventTable = 'user_event'
 const imageTable = 'images'
 
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
-const DEFAULT_USER_PROFILE_IMAGE = 'http://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
+const DEFAULT_USER_PROFILE_IMAGE = 'https://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
 
 const USER_ROLE_ADMIN = 'admin'
 const USER_ROLE_REGULAR = 'regular'
