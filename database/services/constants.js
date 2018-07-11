@@ -8,7 +8,8 @@ const universityTable = 'universities'
 const eventRatingTable = 'event_rating'
 const userRatingTable = 'user_rating'
 const userEventTable = 'user_event'
-const imageTable = 'images'
+const profileImageTable = 'profile_images'
+const momentImageTable = 'moment_images'
 
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
 const DEFAULT_USER_PROFILE_IMAGE = 'https://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
@@ -21,7 +22,7 @@ const USER_EVENT_FIELDS = [
   'users.last_name as last_name', 'users.email as email', 'users.role as user_role',
   'users.verified_at as user_verified_at', 'users.birthday as birthday',
   'users.hashed_password as hashed_password', 'users.gender as gender',
-  'images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
+  'profile_images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
   'events.id as event_id', 'events.title as event_title', 'events.location as event_location',
   'events.icon_url as event_icon_url', 'events.category as event_category',
   'events.description as event_description', 'events.start_time as event_start_time',
@@ -41,7 +42,7 @@ const USER_EVENT_FULL_FIELDS = [
   'users.last_name as last_name', 'users.email as email', 'users.role as user_role',
   'users.verified_at as user_verified_at', 'users.birthday as birthday',
   'users.hashed_password as hashed_password', 'users.gender as gender',
-  'images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
+  'profile_images.image_url as user_image_url', 'users.about as user_about', 'users.university_id as university_id',
   'events.id as event_id', 'events.title as event_title', 'events.location as event_location',
   'events.icon_url as event_icon_url', 'events.category as event_category',
   'events.description as event_description', 'events.start_time as event_start_time',
@@ -62,7 +63,7 @@ const USER_FIELDS_WITH_IMAGE = [
   'users.id as id', 'users.first_name as first_name', 'users.middle_name as middle_name',
   'users.last_name as last_name', 'users.email as email', 'users.role as role',
   'users.verified_at as verified_at', 'users.birthday as birthday',
-  'users.gender as gender', 'images.image_url as image_url',
+  'users.gender as gender', 'profile_images.image_url as image_url',
   'users.about as about', 'users.university_id as university_id'
 ]
 
@@ -79,6 +80,7 @@ module.exports = {
   USER_EVENT_FULL_FIELDS, USER_FIELDS_WITH_IMAGE,
   DEFAULT_USER_PROFILE_IMAGE,
   universityTable,
-  userTable, eventTable, tokenTable, imageTable,
+  userTable, eventTable, tokenTable,
+  profileImageTable, momentImageTable,
   eventRatingTable, userRatingTable, userEventTable
 }

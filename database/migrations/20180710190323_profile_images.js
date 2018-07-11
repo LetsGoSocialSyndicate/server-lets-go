@@ -1,15 +1,12 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { profileImageTable, eventTable, userTable } = require('../services/constants')
+const { profileImageTable, userTable } = require('../services/constants')
 
 exports.up = (knex, Promise) => {
-  return knex.schema.createTable(imageTable, (table) => {
+  return knex.schema.createTable(profileImageTable, (table) => {
     table.uuid('id')
     table.text('image_url').notNullable().defaultTo('')
-
-    table.uuid('event_id')
-    table.foreign('event_id').references('id').inTable(eventTable).onDelete('cascade')
 
     table.uuid('user_id')
     table.foreign('user_id').references('id').inTable(userTable).onDelete('cascade')
@@ -17,12 +14,12 @@ exports.up = (knex, Promise) => {
     table.timestamps(true, true)
   })
     .then(() => {
-      return knex.schema.alterTable(imageTable, (table) => {
+      return knex.schema.alterTable(profileImageTable, (table) => {
         table.unique('id')
       })
     })
 }
 
 exports.down = (knex, Promise) => {
-  return knex.schema.dropTableIfExists(imageTable)
+  return knex.schema.dropTableIfExists(profileImageTable)
 }

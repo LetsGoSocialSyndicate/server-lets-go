@@ -1,14 +1,14 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { imageTable, DEFAULT_USER_PROFILE_IMAGE } = require('../services/constants')
+const { profileImageTable, DEFAULT_USER_PROFILE_IMAGE } = require('../services/constants')
 
 exports.seed = (knex, Promise) => {
   // Deletes ALL existing entries
-  return knex(imageTable).del()
+  return knex(profileImageTable).del()
     .then(() => {
       // Inserts seed entries
-      return knex(imageTable).insert([
+      return knex(profileImageTable).insert([
         {
           id: 'be544fd3-7fc8-42c7-bc3b-696490aa22f5',
           image_url: DEFAULT_USER_PROFILE_IMAGE,
