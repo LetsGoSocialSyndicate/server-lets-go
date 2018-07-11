@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const UserService = require('../database/services/userService')
-const ImageService = require('../database/services/imageService')
+const ProfileImageService = require('../database/services/profileImageService')
 const TokenService = require('../database/services/tokenService')
 const { ALREADY_EXISTS, ALREADY_EXISTS_UNVERIFIED, PASSWORD_REGULAR_EXP,
   DATABASE_ERROR, SENDING_MAIL_ERROR, TOKEN_EXPIRED } = require('../utilities/constants')
@@ -93,7 +93,7 @@ router.post('/', (req, res, next) => {
 
   const userService = new UserService()
   const tokenService = new TokenService()
-  const imageService = new ImageService()
+  const profileImageService = new ProfileImageService()
 
   // Create and save the user
   // By default verified_at is null
@@ -127,7 +127,7 @@ router.post('/', (req, res, next) => {
         .then(result => {
           console.log('result', result)
           console.log('result', result)
-          imageService.insertUserProfileImage(user, DEFAULT_USER_PROFILE_IMAGE)
+          profileImageService.insert(user, DEFAULT_USER_PROFILE_IMAGE)
 
           return sendEmail(email, 'Let\'s Go: Account Verification',
             `<html>

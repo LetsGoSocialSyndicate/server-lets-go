@@ -4,10 +4,10 @@
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { imageTable } = require('./constants')
+const { profileImageTable } = require('./constants')
 
-class ImageService {
-  insertUserProfileImage(user, imageUrl) {
+class ProfileImageService {
+  insert(user, imageUrl) {
     if (!user) {
       throw boom.badRequest('User is required')
     }
@@ -15,7 +15,7 @@ class ImageService {
       throw boom.badRequest('Image URL is required')
     }
 
-    return knex(imageTable)
+    return knex(profileImageTable)
       .returning('*')
       .insert({
         id: uuid(),
@@ -36,32 +36,31 @@ class ImageService {
       })
   }
 
-  insertMomentImage(event, imageUrl) {
-    if (!event) {
-      throw boom.badRequest('Event is required')
+  update(profileImage) {
+    if (!profileImage.id) {
+      throw boom.badRequest('Id is required')
     }
-    if (!imageUrl) {
+    if (!profileImage.image_url) {
       throw boom.badRequest('Image URL is required')
     }
 
-    return knex(imageTable)
+    return knex(profileImageTable)
       .returning('*')
-      .insert({
-        id: uuid(),
-        event_id: event.id,
-        image_url: imageUrl
+      .update({
+        image_url: profileImage.image_url
       })
+      .where('id', profileImage.id)
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]
         }
         if (rows.length > 1) {
-          throw boom.badImplementation(`Too many moment images for the id, ${rows[0].id}`)
+          throw boom.badImplementation(`Too many user profile images for the id, ${rows[0].id}`)
         }
-        throw boom.badImplementation(`Unable to insert moment image`)
+        throw boom.badImplementation(`Unable to update user profile image`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error inserting moment image`)
+        throw err.isBoom ? err : boom.badImplementation(`Error updating user profile image`)
       })
   }
 
@@ -69,7 +68,7 @@ class ImageService {
     if (!id) {
       throw boom.badRequest('Image id is required')
     }
-    return knex(imageTable)
+    return knex(profileImageTable)
       .where('id', id)
       .del()
       .returning('*')
@@ -89,4 +88,4 @@ class ImageService {
   }
 }
 
-module.exports = ImageService
+module.exports = ProfileImageService
