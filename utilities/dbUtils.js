@@ -2,28 +2,26 @@
  * Copyright 2018, Socializing Syndicate Corp.
  */
 const uuid = require('uuid')
-const express = require('express')
 const boom = require('boom')
 const jwt = require('jsonwebtoken')
 
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
-const { TOKEN_EXPIRED, DATABASE_ERROR } = require('./constants')
+const { TOKEN_EXPIRED } = require('./constants')
+
 const userService = new UserService()
 const tokenService = new TokenService()
 
 function retrieveUser(req, res, next) {
   if (req.email) {
-    userService.getByEmail(req.email)
+    userService.getByEmail(req.email, false)
       .then((user) => {
         req.user = user
         next()
-      })
-      .catch(() => {
+      }).catch(() => {
         next(boom.unauthorized())
       })
-  }
-  else {
+  } else {
     next(boom.unauthorized())
   }
 }
@@ -39,8 +37,7 @@ function isTokenExpired(code) {
         // change later to 10 minutes
         if (tokenAge > ONE_DAY) {
           rejected({ err: TOKEN_EXPIRED })
-        }
-        else {
+        } else {
           resolved(record)
         }
       })
@@ -50,7 +47,7 @@ function isTokenExpired(code) {
 
 function checkToken(email, code) {
   return isTokenExpired(code)
-    .then((tokenRecord) => {
+    .then(() => {
       return userService.getByEmail(email).then((userRecord) => {
         const payload = { email: userRecord.email, userId: userRecord.id }
         const sessionToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' })
