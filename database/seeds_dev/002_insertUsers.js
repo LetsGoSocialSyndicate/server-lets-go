@@ -10,6 +10,19 @@ exports.seed = (knex, Promise) => {
       // Inserts seed entries
       return knex(userTable).insert([
         {
+          id: '747478d5-c17f-46a5-89ac-b44b5fdf2045',
+          first_name: 'Sukmi',
+          middle_name: '',
+          last_name: 'Ledru',
+          email: 'sukmi.ledru@gmail.com',
+          role: USER_ROLE_REGULAR,
+          verified_at: '2018-07-10',
+          birthday: '2000-07-11',
+          hashed_password: '$2b$08$vCYuiN3EEm99oqEFx6qn3eFlTvCqX6zxYi7iGbaZ3zjo6fGQdXfzG',
+          gender: 'female',
+          university_id: UUID_UNIVERSITY_OF_COLORADO
+        },
+        {
           id: '8ed01d49-b0c7-4a4b-941a-fad2c346d9b4',
           first_name: 'Jane',
           middle_name: '',

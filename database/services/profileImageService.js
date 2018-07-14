@@ -36,20 +36,20 @@ class ProfileImageService {
       })
   }
 
-  update(profileImage) {
-    if (!profileImage.id) {
-      throw boom.badRequest('Id is required')
+  update(userId, imageUrl) {
+    if (!userId) {
+      throw boom.badRequest('userId is required')
     }
-    if (!profileImage.image_url) {
+    if (!imageUrl) {
       throw boom.badRequest('Image URL is required')
     }
 
     return knex(profileImageTable)
       .returning('*')
       .update({
-        image_url: profileImage.image_url
+        image_url: imageUrl
       })
-      .where('id', profileImage.id)
+      .where('user_id', userId)
       .then((rows) => {
         if (rows.length === 1) {
           return rows[0]

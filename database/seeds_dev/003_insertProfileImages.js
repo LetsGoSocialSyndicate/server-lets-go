@@ -33,6 +33,11 @@ exports.seed = (knex, Promise) => {
           id: '63c8f7e4-7aea-4f43-a40c-98a8cc38c42e',
           image_url: DEFAULT_USER_PROFILE_IMAGE,
           user_id: 'e407bfa4-f37e-4185-813c-677c935dbc4d'
+        },
+        {
+          id: '4bf714f3-4036-4817-8fa8-4dbee6d3b470',
+          image_url: DEFAULT_USER_PROFILE_IMAGE,
+          user_id: '747478d5-c17f-46a5-89ac-b44b5fdf2045'
         }
       ])
     })

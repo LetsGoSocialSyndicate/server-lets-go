@@ -15,9 +15,11 @@ const TokenService = require('../database/services/tokenService')
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
+  console.log('GET Event Feeds')
   const eventService = new UserEventService()
   eventService.getAllEvents()
     .then((rows) => {
+      console.log('events', rows)
       res.json(rows)
     })
     .catch((err) => next(err))

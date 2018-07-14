@@ -4,6 +4,7 @@ const boom = require('boom')
 const router = express.Router()
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
+const ProfileImageService = require('../database/services/profileImageService')
 const {verifyToken} = require('../utilities/jwtUtil')
 const {retrieveUser} = require('../utilities/dbUtils')
 
@@ -44,17 +45,27 @@ router.post('/', (req, res, next) => {
 })
 
 router.patch('/:id', (req, res, next) => {
-  //verifyToken middleware puts userId and email to request
+  // verifyToken middleware puts userId and email to request
   console.log('users PATCH:', req.params, req.userId, req.email, req.body)
   const userService = new UserService()
+  const profileImageService = new ProfileImageService()
   if (req.userId != req.params.id) {
     next(boom.unauthorized("User ID does not match"))
     return
   }
-  const user = {id: req.userId, ...req.body}
-  userService.update(user).then(result => {
-    res.json(result)
-  }).catch((err) => next(err))
+
+  const { first_name, middle_name, last_name, about } = req.body
+  const { image_url } = req.body
+  const user = {id: req.userId, first_name, middle_name, last_name, about }
+  // SL: update() should use image id instead of user_id.
+  profileImageService.update(req.userId, image_url)
+    .then((result) => {
+      return userService.update(user)
+    })
+    .then(result => {
+      res.json(result)
+    })
+    .catch((err) => next(err))
 })
 
 router.delete('/:email', (req, res, next) => {

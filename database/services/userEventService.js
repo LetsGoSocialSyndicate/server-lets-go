@@ -4,7 +4,7 @@
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { userTable, eventTable, userEventTable, imageTable,
+const { userTable, eventTable, userEventTable, profileImageTable,
   USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS
 } = require('./constants')
 
@@ -12,7 +12,7 @@ class UserEventService {
   getAllEvents() {
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .orderBy(`${userEventTable}.posted_at`, 'desc')
@@ -34,7 +34,7 @@ class UserEventService {
     }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userEventTable}.id`, user_event_id)
@@ -59,7 +59,7 @@ class UserEventService {
     }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.requested_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
@@ -82,7 +82,7 @@ class UserEventService {
     }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
@@ -106,7 +106,7 @@ class UserEventService {
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .innerJoin(userTable, `${userEventTable}.posted_by`, `${userTable}.id`)
-      .leftJoin(imageTable, `${imageTable}.user_id`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
       .then((rows) => {
         if (rows.length > 0) {
