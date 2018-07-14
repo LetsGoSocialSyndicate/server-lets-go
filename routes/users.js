@@ -4,7 +4,6 @@ const boom = require('boom')
 const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
-const ProfileImageService = require('../database/services/profileImageService')
 
 const router = express.Router()
 
