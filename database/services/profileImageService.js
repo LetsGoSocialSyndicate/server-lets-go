@@ -7,6 +7,19 @@ const uuid = require('uuid/v4')
 const { profileImageTable } = require('./constants')
 
 class ProfileImageService {
+  getProfileImages(user_id) {
+    return knex(profileImageTable)
+      .select('*')
+      .where('user_id', user_id)
+      .then(rows =>
+        rows.map(row => ({ id: row.id, image_url: row.image_url }))
+      )
+      .catch((err) => {
+        console.log('getProfileImages: err', err)
+        throw boom.badImplementation(`Error retrieving images`)
+      })
+  }
+
   insert(user, imageUrl) {
     if (!user) {
       throw boom.badRequest('User is required')
