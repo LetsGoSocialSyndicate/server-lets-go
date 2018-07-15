@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 })
 
 // error handler
-app.use((err, req, res) => {
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.log('all-catch err: ', err)
   // set locals, only providing error in development
   res.locals.message = err.message
