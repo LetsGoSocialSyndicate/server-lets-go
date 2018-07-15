@@ -7,6 +7,7 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable(profileImageTable, (table) => {
     table.uuid('id')
     table.text('image_url').notNullable().defaultTo('')
+    // table.text('public_id').notNullable().defaultTo('')
 
     table.uuid('user_id')
     table.foreign('user_id').references('id').inTable(userTable).onDelete('cascade')
