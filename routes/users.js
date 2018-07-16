@@ -1,51 +1,21 @@
 /* Copyright 2018, Socializing Syndicate Corp. */
 const boom = require('boom')
-const cloudinary = require('cloudinary')
 const express = require('express')
 const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
+const {
+  cloudinaryAddImage,
+  cloudinaryRemoveImage,
+  getImageDescription
+} = require('../utilities/cloudinary')
 
 const router = express.Router()
-const DATA_URI_PREFIX = 'data:'
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_LOGIN,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-})
 
 // NOTE: These constants should match client side
 const IMAGE_OP_UPDATE = 'IMAGE_OP_UPDATE'
 const IMAGE_OP_ADD = 'IMAGE_OP_ADD'
 const IMAGE_OP_DELETE = 'IMAGE_OP_DELETE'
-
-const getImageDescription = image => {
-  if (image.image_url.startsWith(DATA_URI_PREFIX)) {
-    const image_url = `${image.image_url.split(',')[0]},...`
-    return { ...image, image_url }
-  }
-  return image
-}
-
-const updateImage = image => {
-  if (!image.image_url.startsWith(DATA_URI_PREFIX)) {
-    return Promise.resolve({
-      id: image.id,
-      image_url: image.image_url,
-      public_id: ''
-    })
-  }
-  return cloudinary.v2.uploader.upload(
-    image.image_url, { type: 'private' }
-  ).then(response => {
-    console.log('users PATCH updateImage:', response)
-    return {
-      id: image.id,
-      image_url: response.secure_url,
-      public_id: response.public_id
-    }
-  })
-}
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -115,14 +85,33 @@ router.patch('/:id/images', (req, res, next) => {
   const results = req.body.images.map(image => {
     console.log('users images PATCH image:', getImageDescription(image))
     switch (image.op) {
-    case IMAGE_OP_UPDATE:
-      return updateImage(image).then(
-        cloudinaryImage => profileImageService.update(cloudinaryImage)
-      )
+    case IMAGE_OP_UPDATE: {
+      const oldImagePromise =
+        profileImageService.getProfileImageDetails(image.id)
+      // NOTE: Maybe it is possible here to do "Add with overwrite",
+      // instead "Add and delete".
+      return cloudinaryAddImage(image).then(cloudinaryImage => {
+        return oldImagePromise.then(oldImage => {
+          return profileImageService.update(cloudinaryImage).then(
+            () => cloudinaryRemoveImage(oldImage)
+          )
+        })
+      })
+    }
     case IMAGE_OP_ADD:
-      return profileImageService.insert(req.user, image.image_url)
+      return cloudinaryAddImage(image).then(cloudinaryImage => {
+        return profileImageService.insert(
+          req.user, cloudinaryImage.image_url, cloudinaryImage.public_id
+        )
+      })
     case IMAGE_OP_DELETE:
-      return profileImageService.delete(image.id)
+      return profileImageService.getProfileImageDetails(
+        image.id
+      ).then(oldImage => {
+        return profileImageService.delete(oldImage.id).then(
+          () => cloudinaryRemoveImage(oldImage)
+        )
+      })
     default:
       return Promise.resolve()
     }

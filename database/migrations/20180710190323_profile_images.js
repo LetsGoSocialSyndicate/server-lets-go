@@ -3,11 +3,11 @@
  */
 const { profileImageTable, userTable } = require('../services/constants')
 
-exports.up = (knex, Promise) => {
+exports.up = (knex, Promise) => { // eslint-disable-line no-unused-vars
   return knex.schema.createTable(profileImageTable, (table) => {
     table.uuid('id')
     table.text('image_url').notNullable().defaultTo('')
-    // table.text('public_id').notNullable().defaultTo('')
+    table.text('public_id').notNullable().defaultTo('')
 
     table.uuid('user_id')
     table.foreign('user_id').references('id').inTable(userTable).onDelete('cascade')
@@ -21,6 +21,6 @@ exports.up = (knex, Promise) => {
     })
 }
 
-exports.down = (knex, Promise) => {
+exports.down = (knex, Promise) => { // eslint-disable-line no-unused-vars
   return knex.schema.dropTableIfExists(profileImageTable)
 }

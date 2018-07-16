@@ -6,21 +6,47 @@ const boom = require('boom')
 const uuid = require('uuid/v4')
 const { profileImageTable } = require('./constants')
 
+
 class ProfileImageService {
-  getProfileImages(user_id) {
+  // Returned list contains all stored image properties.
+  getProfileImageDetails(id) {
+    if (!id) {
+      throw boom.badRequest('Image id is required')
+    }
     return knex(profileImageTable)
       .select('*')
-      .where('user_id', user_id)
-      .then(rows =>
-        rows.map(row => ({ id: row.id, image_url: row.image_url }))
-      )
+      .where('id', id)
+      .then(rows => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many images for the id, ${id}`)
+        }
+        throw boom.notFound(`No image found for the id, ${id}`)
+      })
       .catch((err) => {
-        console.log('getProfileImages: err', err)
+        console.log('ProfileImageService.getProfileImageDetails: err', err)
+        throw boom.badImplementation(`Error retrieving image details`)
+      })
+  }
+
+  // Returned list contains only image id and url,
+  // intentionally no other details included.
+  getProfileImages(user_id) {
+    if (!user_id) {
+      throw boom.badRequest('User id is required')
+    }
+    return knex(profileImageTable)
+      .select(['id', 'image_url'])
+      .where('user_id', user_id)
+      .catch((err) => {
+        console.log('ProfileImageService.getProfileImages: err', err)
         throw boom.badImplementation(`Error retrieving images`)
       })
   }
 
-  insert(user, imageUrl) {
+  insert(user, imageUrl, publicId = '') {
     if (!user) {
       throw boom.badRequest('User is required')
     }
@@ -33,7 +59,8 @@ class ProfileImageService {
       .insert({
         id: uuid(),
         user_id: user.id,
-        image_url: imageUrl
+        image_url: imageUrl,
+        public_id: publicId
       })
       .then((rows) => {
         if (rows.length === 1) {
@@ -45,6 +72,7 @@ class ProfileImageService {
         throw boom.badImplementation(`Unable to insert user profile image`)
       })
       .catch((err) => {
+        console.log('ERROR in ProfileImageService.insert:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user profile image`)
       })
   }
@@ -60,7 +88,8 @@ class ProfileImageService {
     return knex(profileImageTable)
       .returning('*')
       .update({
-        image_url: profileImage.image_url
+        image_url: profileImage.image_url,
+        public_id: profileImage.public_id
       })
       .where('id', profileImage.id)
       .then((rows) => {
@@ -73,6 +102,7 @@ class ProfileImageService {
         throw boom.badImplementation(`Unable to update user profile image`)
       })
       .catch((err) => {
+        console.log('ERROR in ProfileImageService.update:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error updating user profile image`)
       })
   }
@@ -95,7 +125,7 @@ class ProfileImageService {
         throw boom.notFound(`No image found for the id, ${id}`)
       })
       .catch((err) => {
-        console.log('delete image: err', err)
+        console.log('ERROR in ProfileImageService.delete:', err)
         throw boom.badImplementation(`Error deleting image with the id, ${id}`)
       })
   }
