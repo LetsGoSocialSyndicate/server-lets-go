@@ -16,10 +16,11 @@ const eventsRouter = require('./routes/events')
 const loginRouter = require('./routes/login')
 const usersRouter = require('./routes/users')
 const confirmationRouter = require('./routes/confirmation')
-
+const startChat = require('./chat/chat')
 
 const app = express()
 app.disable('x-powered-by')
+startChat(app)
 
 app.use(logger('dev'))
 app.use(express.json({ limit: '20mb' }))
