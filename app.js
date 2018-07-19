@@ -57,7 +57,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')))
 
 app.use('/login', loginRouter)
 app.use('/signup', signupRouter)
-app.use('/events', eventsRouter)
+app.use('/events', verifyToken, retrieveUser, eventsRouter)
 app.use('/users', verifyToken, retrieveUser, usersRouter)
 app.use('/confirmation', confirmationRouter)
 

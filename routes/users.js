@@ -49,6 +49,20 @@ router.get('/:email/hosted', (req, res, next) => {
   }).catch((err) => next(err))
 })
 
+router.get('/:email/all', (req, res, next) => {
+  console.log('In router GET: /users/all', req.user)
+  const userEventService = new UserEventService()
+  Promise.all([
+    userEventService.getAllEventsByParticipant(req.user.id),
+    userEventService.getAllEventsByOrganizer(req.user.id)
+  ])
+    .then((rows) => {
+      console.log('All events', [...rows[0], ...rows[1]])
+
+      res.json([...rows[0], ...rows[1]])
+    }).catch((err) => next(err))
+})
+
 router.post('/', (req, res) => {
   res.send('respond with a resource')
 })
