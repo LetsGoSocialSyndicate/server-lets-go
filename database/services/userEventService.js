@@ -98,6 +98,28 @@ class UserEventService {
       })
   }
 
+  getAllEventsByOtherOrganizer(userId) {
+    if (!userId) {
+      throw boom.badRequest('User id is required')
+    }
+    return knex(userTable)
+      .select(USER_EVENT_FIELDS)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .whereNot(`${userTable}.id`, userId)
+      .then((rows) => {
+        if (rows.length > 0) {
+          return rows
+        }
+        return []
+      })
+      .catch((err) => {
+        console.log('getAllEventsByParticipant: err', err)
+        throw boom.badImplementation(`Error retrieving events`)
+      })
+  }
+
   getEventOrganizers(eventId) {
     if (!eventId) {
       throw boom.badRequest('Event id is required')

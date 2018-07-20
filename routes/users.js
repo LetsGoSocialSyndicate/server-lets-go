@@ -58,8 +58,17 @@ router.get('/:email/all', (req, res, next) => {
   ])
     .then((rows) => {
       console.log('All events', [...rows[0], ...rows[1]])
-
       res.json([...rows[0], ...rows[1]])
+    }).catch((err) => next(err))
+})
+
+router.get('/:email/others', (req, res, next) => {
+  console.log('In router GET: /users/others', req.user)
+  const userEventService = new UserEventService()
+  userEventService.getAllEventsByOtherOrganizer(req.user.id)
+    .then((rows) => {
+      console.log('All other events', rows)
+      res.json(rows)
     }).catch((err) => next(err))
 })
 
