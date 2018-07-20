@@ -34,7 +34,9 @@ const USER_EVENT_FIELDS = [
   'user_event.requested_at as join_requested_at',
   'user_event.first_viewed_by as join_request_first_viewed_by',
   'user_event.first_viewed_at as join_request_first_viewed_at',
+  'user_event.accepted_by as join_request_accepted_by',
   'user_event.accepted_at as join_request_accepted_at',
+  'user_event.rejected_by as join_request_rejected_by',
   'user_event.rejected_at as join_request_rejected_at'
 ]
 
@@ -56,7 +58,9 @@ const USER_EVENT_FULL_FIELDS = [
   'user_event.first_viewed_by as join_request_first_viewed_by',
   'user_event.first_viewed_at as join_request_first_viewed_at',
   'user_event.accepted_at as join_request_accepted_at',
+  'user_event.accepted_by as join_request_accepted_by',
   'user_event.rejected_at as join_request_rejected_at',
+  'user_event.rejected_by as join_request_rejected_by',
   'users2.first_name as organizer_first_name', 'users2.middle_name as organizer_middle_name',
   'users2.last_name as organizer_last_name'
 ]
@@ -66,7 +70,7 @@ const USER_FIELDS_WITH_IMAGE = [
   'users.last_name as last_name', 'users.email as email', 'users.role as role',
   'users.verified_at as verified_at', 'users.birthday as birthday',
   'users.gender as gender',
-  'profile_images.image_url as image_url', 'profile_images.id as profile_image_id', 
+  'profile_images.image_url as image_url', 'profile_images.id as profile_image_id',
   'users.about as about', 'users.university_id as university_id'
 ]
 
