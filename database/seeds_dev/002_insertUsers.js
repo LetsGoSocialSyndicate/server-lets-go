@@ -1,9 +1,13 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
-const { UUID_UNIVERSITY_OF_COLORADO, USER_ROLE_ADMIN, USER_ROLE_REGULAR, userTable } = require('../services/constants')
+const {
+  UUID_UNIVERSITY_OF_COLORADO,
+  USER_ROLE_REGULAR,
+  userTable
+} = require('../services/constants')
 
-exports.seed = (knex, Promise) => {
+exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
   // Deletes ALL existing entries
   return knex(userTable).del()
     .then(() => {
@@ -85,6 +89,32 @@ exports.seed = (knex, Promise) => {
           hashed_password: '$2b$10$uh0Y5nzAA80lZHQZEc6uzeeI5UDB.TPScJ/6T/OMdTSMzzGSSBPhm',
           gender: 'female',
           birthday: '1999-01-01',
+          university_id: UUID_UNIVERSITY_OF_COLORADO
+        },
+        {
+          id: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
+          first_name: 'Tanya',
+          middle_name: '',
+          last_name: 'Panich',
+          email: 'panich.photos3@gmail.com',
+          verified_at: '2018-07-16',
+          role: USER_ROLE_REGULAR,
+          hashed_password: '$2b$08$cYF8YEeqvofNV4z94nP6yOLzkb5IYG/PAlvLwbyGrXUjgTwc4fkQK',
+          gender: 'female',
+          birthday: '2000-07-11',
+          university_id: UUID_UNIVERSITY_OF_COLORADO
+        },
+        {
+          id: 'e2aec1a1-60b4-46c0-8fb6-9bb663de862b',
+          first_name: 'Panya',
+          middle_name: '',
+          last_name: 'Tanich',
+          email: 'panich.photos3+1@gmail.com',
+          verified_at: '2018-06-16',
+          role: USER_ROLE_REGULAR,
+          hashed_password: '$2b$08$giXDfbEQCcLUi07YoPZFCuilsKfpPn6RU0j4y.Lz6MF4ez1g3BpA.',
+          gender: 'female',
+          birthday: '1997-09-11',
           university_id: UUID_UNIVERSITY_OF_COLORADO
         }
       ])

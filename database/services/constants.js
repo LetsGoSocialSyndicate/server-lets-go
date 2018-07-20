@@ -10,6 +10,7 @@ const userRatingTable = 'user_rating'
 const userEventTable = 'user_event'
 const profileImageTable = 'profile_images'
 const momentImageTable = 'moment_images'
+const messageTable = 'messages'
 
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
 const DEFAULT_USER_PROFILE_IMAGE = 'https://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
@@ -80,14 +81,37 @@ const USER_FIELDS = [
   'verified_at', 'birthday', 'gender', 'about', 'university_id'
 ]
 
+const MESSAGE_FIELDS_WITH_USERNAMES = [
+  'messages.id as id', 'messages.message as message',
+  'messages.sender as sender', 'messages.recipient as recipient',
+  'messages.sent_at as sent_at',
+  'users.first_name as first_name', 'users.last_name as last_name'
+]
+
+const CHAT_USERS_FIELDS = [
+  'messages.sender as sender', 'messages.recipient as recipient',
+  'users.first_name as first_name', 'users.last_name as last_name'
+]
+
 module.exports = {
   UUID_UNIVERSITY_OF_COLORADO,
-  USER_ROLE_ADMIN, USER_ROLE_REGULAR,
-  USER_EVENT_FIELDS, USER_FIELDS,
-  USER_EVENT_FULL_FIELDS, USER_FIELDS_WITH_IMAGE,
+  USER_ROLE_ADMIN,
+  USER_ROLE_REGULAR,
+  USER_EVENT_FIELDS,
+  USER_FIELDS,
+  USER_EVENT_FULL_FIELDS,
+  USER_FIELDS_WITH_IMAGE,
+  MESSAGE_FIELDS_WITH_USERNAMES,
   DEFAULT_USER_PROFILE_IMAGE,
+  CHAT_USERS_FIELDS,
   universityTable,
-  userTable, eventTable, tokenTable,
-  profileImageTable, momentImageTable,
-  eventRatingTable, userRatingTable, userEventTable
+  userTable,
+  eventTable,
+  tokenTable,
+  profileImageTable,
+  momentImageTable,
+  eventRatingTable,
+  userRatingTable,
+  userEventTable,
+  messageTable
 }

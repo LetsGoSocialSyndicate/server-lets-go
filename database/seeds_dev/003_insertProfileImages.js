@@ -44,6 +44,18 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           image_url: DEFAULT_USER_PROFILE_IMAGE,
           user_id: '747478d5-c17f-46a5-89ac-b44b5fdf2045',
           public_id: ''
+        },
+        {
+          id: '5e890565-926b-4480-8663-2a2f65229595',
+          image_url: 'https://res.cloudinary.com/socializing-syndicate-corporation/image/private/s--E1AdB_gk--/v1531832242/vmygbuzmusqbe40bdph1.jpg',
+          user_id: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
+          public_id: ''
+        },
+        {
+          id: '98a1253e-0967-4ae7-aa33-e9e6a9990fd2',
+          image_url: DEFAULT_USER_PROFILE_IMAGE,
+          user_id: 'e2aec1a1-60b4-46c0-8fb6-9bb663de862b',
+          public_id: ''
         }
       ])
     })
