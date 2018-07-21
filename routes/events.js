@@ -132,9 +132,7 @@ const sendNotification = (res, organizers, req) => {
         if (organizer.email) {
           return sendEmail(organizer.email, `Let's Go: Join Request`,
             `Hello ${organizer.first_name},\n
-            ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n
-            Please login to Let's Go app and accept or reject the request.\n
-            link:\n${host}\/request\/verify\/${tokenEntry.token}`,
+            ${requestor.first_name} ${requestor.last_name} has requested to join your event.\n`,
             'Your request has been sent.', 'Error while sending join request email')
         }
       })
