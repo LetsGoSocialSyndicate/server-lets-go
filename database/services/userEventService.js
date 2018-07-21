@@ -172,6 +172,51 @@ class UserEventService {
       })
   }
 
+  countEventsByParticipant(userId) {
+    if (!userId) {
+      throw boom.badRequest('User id is required')
+    }
+    return knex(userTable)
+      .count(`${userEventTable}.requested_by`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.requested_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
+      .where(`${userTable}.id`, userId)
+      .then((rows) => {
+        if (rows.length > 0) {
+          return rows[0]
+        }
+        return { count: 0}
+      })
+      .catch((err) => {
+        console.log('countEventsByParticipant: err', err)
+        throw boom.badImplementation(`Error counting events`)
+      })
+  }
+
+  countEventsByOrganizer(userId) {
+    if (!userId) {
+      throw boom.badRequest('User id is required')
+    }
+    return knex(userTable)
+      .count(`${userEventTable}.posted_by`)
+      .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
+      .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
+      .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
+      .where(`${userTable}.id`, userId)
+      .then((rows) => {
+        if (rows.length > 0) {
+          return rows[0]
+        }
+        return { count: 0}
+      })
+      .catch((err) => {
+        console.log('countEventsByOrganizer: err', err)
+        throw boom.badImplementation(`Error counting events`)
+      })
+  }
+
   insert(record) {
     if (!record.event_id) {
       throw boom.badRequest('Event id is required')

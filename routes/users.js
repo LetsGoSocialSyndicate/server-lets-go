@@ -57,7 +57,7 @@ router.get('/:email/all', (req, res, next) => {
     userEventService.getAllEventsByOrganizer(req.user.id)
   ])
     .then((rows) => {
-      console.log('All events', [...rows[0], ...rows[1]])
+      // console.log('All events', [...rows[0], ...rows[1]])
       res.json([...rows[0], ...rows[1]])
     }).catch((err) => next(err))
 })
@@ -67,8 +67,25 @@ router.get('/:email/others', (req, res, next) => {
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOtherOrganizer(req.user.id)
     .then((rows) => {
-      console.log('All other events', rows)
+      // console.log('All other events', rows)
       res.json(rows)
+    }).catch((err) => next(err))
+})
+
+router.get('/:email/statistics', (req, res, next) => {
+  console.log('In router GET: /users/statistics', req.user)
+  const userEventService = new UserEventService()
+  Promise.all([
+    userEventService.countEventsByParticipant(req.user.id),
+    userEventService.countEventsByOrganizer(req.user.id)
+  ])
+    .then((rows) => {
+      const statistics = {
+        countJoined: rows[0].count,
+        countHosted: rows[1].count
+      }
+      console.log('All events statistics', statistics)
+      res.json({ statistics })
     }).catch((err) => next(err))
 })
 
