@@ -64,6 +64,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
+      .orderBy(`${userEventTable}.posted_at`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -86,6 +87,7 @@ class UserEventService {
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
+      .orderBy(`${userEventTable}.posted_at`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -108,6 +110,7 @@ class UserEventService {
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .whereNot(`${userTable}.id`, userId)
+      .orderBy(`${userEventTable}.posted_at`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -129,6 +132,7 @@ class UserEventService {
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .innerJoin(userTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
+      .orderBy(`${userEventTable}.posted_at`, 'desc')
       .where(`${eventTable}.id`, eventId)
       .then((rows) => {
         if (rows.length > 0) {
