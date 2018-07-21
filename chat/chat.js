@@ -21,7 +21,8 @@ const getChatUserName =
 const getChatUser = user => {
   return {
     _id: user.id,
-    name: getChatUserName(user)
+    name: getChatUserName(user),
+    avatar: user.image_url
   }
 }
 
@@ -52,8 +53,6 @@ const startChat = app => {
         socket.emit(CHATMATES, chatmates.map(chatmate => getChatUser(chatmate)))
       })
     })
-
-    // TODO: Handle LEAVE request - remove user from sockets...
 
     socket.on(GET_PREVIOUS_MESSAGES, (userId, chatmateId) => {
       console.log('CHAT: user requested previous messages', userId, chatmateId)

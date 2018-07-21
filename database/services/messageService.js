@@ -6,6 +6,7 @@ const boom = require('boom')
 const {
   messageTable,
   userTable,
+  profileImageTable,
   MESSAGE_FIELDS_WITH_USERNAMES,
   CHAT_USERS_FIELDS
 } = require('./constants')
@@ -61,13 +62,15 @@ class MessageService {
     return knex(messageTable)
       .select(CHAT_USERS_FIELDS)
       .innerJoin(userTable, `${messageTable}.sender`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${messageTable}.recipient`, `${profileImageTable}.user_id`)
       .where('recipient', user_id)
       .then(rows =>
         removeDuplicates(rows.map(row => {
           return {
             id: row.sender,
             first_name: row.first_name,
-            last_name: row.last_name
+            last_name: row.last_name,
+            image_url: row.image_url
           }
         }))
       )
@@ -84,13 +87,15 @@ class MessageService {
     return knex(messageTable)
       .select(CHAT_USERS_FIELDS)
       .innerJoin(userTable, `${messageTable}.recipient`, `${userTable}.id`)
+      .leftJoin(profileImageTable, `${messageTable}.recipient`, `${profileImageTable}.user_id`)
       .where('sender', user_id)
       .then(rows =>
         removeDuplicates(rows.map(row => {
           return {
             id: row.recipient,
             first_name: row.first_name,
-            last_name: row.last_name
+            last_name: row.last_name,
+            image_url: row.image_url
           }
         }))
       )
