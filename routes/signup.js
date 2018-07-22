@@ -38,7 +38,7 @@ const verifyUserNotInDatabase = (userService, email) => {
 
 const isOlderThan18 = (birthday) => {
   const today = new Date()
-  console.log(birthday, today)
+  // console.log(birthday, today)
   if (today.getFullYear() - birthday.getFullYear() > 18) {
     return true
   }
@@ -58,7 +58,7 @@ const isOlderThan18 = (birthday) => {
 }
 
 router.post('/', (req, res, next) => {
-  console.log("HEADERS:", req.headers)
+  // console.log("HEADERS:", req.headers)
   const {
     email,
     password,
@@ -112,12 +112,12 @@ router.post('/', (req, res, next) => {
   })
     .then(result => {
       user.id = result.id
-      console.log('user', user)
+      // console.log('user', user)
       const tokenEntry = {
         email: email,
         token: crypto.randomBytes(3).toString('hex') //we will need 6 in migrations
       }
-      console.log(tokenEntry);
+      // console.log(tokenEntry);
       // TODO: check if token exists and return error.
       return tokenService.insert(tokenEntry).catch(err => {
         //if we were unable to insert token, we delete user also.
@@ -125,8 +125,8 @@ router.post('/', (req, res, next) => {
         throw err
       })
         .then(result => {
-          console.log('result', result)
-          console.log('result', result)
+          // console.log('result', result)
+          // console.log('result', result)
           profileImageService.insert(user, DEFAULT_USER_PROFILE_IMAGE)
 
           return sendEmail(email, 'Let\'s Go: Account Verification',
@@ -163,7 +163,7 @@ router.post('/', (req, res, next) => {
 })
 
 router.patch('/:code', (req, res, next) => {
-  console.log("HEADERS:", req.headers)
+  // console.log("HEADERS:", req.headers)
   const {
     email,
     password
@@ -175,7 +175,7 @@ router.patch('/:code', (req, res, next) => {
     next(invalidInput("Email cannot be blank"))
     return
   }
-  console.log('email', email, 'code', code)
+  // console.log('email', email, 'code', code)
   const userService = new UserService()
   const tokenService = new TokenService()
   checkToken(email, code)
@@ -189,7 +189,7 @@ router.patch('/:code', (req, res, next) => {
       }
       userService.update(user).then(resultUserUpdate => {
         tokenService.delete(code)
-        console.log('result', resultUserUpdate)
+        // console.log('result', resultUserUpdate)
         return res.status(200).send({user: user, token: checkTokenResult.token})
       })
     })

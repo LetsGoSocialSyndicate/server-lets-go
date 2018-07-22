@@ -20,7 +20,7 @@ const cloudinaryAddImage = image => {
   return cloudinary.v2.uploader.upload(
     image.image_url, { type: 'private' }
   ).then(response => {
-    console.log('cloudinaryAddImage:', response)
+    // console.log('cloudinaryAddImage:', response)
     return {
       id: image.id,
       image_url: response.secure_url,
@@ -36,7 +36,7 @@ const cloudinaryRemoveImage = image => {
   return cloudinary.v2.uploader.destroy(
     image.public_id, { type: 'private' }
   ).then(response => {
-    console.log('cloudinaryRemoveImage:', response)
+    // console.log('cloudinaryRemoveImage:', response)
     return {}
   })
 }

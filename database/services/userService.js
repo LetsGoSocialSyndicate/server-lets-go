@@ -117,7 +117,7 @@ class UserService {
     } else {
       throw boom.badRequest('Email or Id is required')
     }
-    console.log('user update start:', user)
+    // console.log('user update start:', user)
     return knex(userTable)
       .where(params.key, params.value)
       // object keys === database keys
@@ -126,7 +126,7 @@ class UserService {
       .update(omitProfileImages(user))
       .returning(USER_FIELDS)
       .then((rows) => {
-        console.log('update rows', rows)
+        // console.log('update rows', rows)
         if (rows.length === 1) {
           return fetchImages ? mergeProfileImages(rows[0]) : rows[0]
         }

@@ -25,7 +25,7 @@ const sendEmail = (to, subject, text, confirmMessage, errorMessage) => {
         console.log('email error:', mailOptions, error)
         reject(constructFailure(SENDING_MAIL_ERROR, errorMessage, 500))
       }
-      console.log('sendMailResult:', info)
+      // console.log('sendMailResult:', info)
       resolve(constructSuccess(confirmMessage))
     })
   })

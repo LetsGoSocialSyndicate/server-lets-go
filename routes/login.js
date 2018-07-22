@@ -30,11 +30,11 @@ const verifyUserInDatabase = (userService, email) => {
 
 router.post('/', (req, res, next) => {
   const {email, password} = req.body
-  console.log("login:", email, password)
+  // console.log("login:", email, password)
   if (email && password) {
     const userService = new UserService()
     userService.getByEmail(email).then((result) => {
-      console.log(result)
+      // console.log(result)
       if (bcrypt.compareSync(password, result.hashed_password)) {
         if (result.verified_at) {
           const payload = {
@@ -76,7 +76,7 @@ router.post('/', (req, res, next) => {
 })
 
 router.post('/code_for_pswd', (req, res, next) => {
-  console.log("HEADERS:", req.headers)
+  // console.log("HEADERS:", req.headers)
   const {email} = req.body
   if (!email) {
     next(invalidInput("Email cannot be blank"))
@@ -90,7 +90,7 @@ router.post('/code_for_pswd', (req, res, next) => {
       email: email,
       token: crypto.randomBytes(3).toString('hex') //we will need at least 6 in migrations
     }
-    console.log(tokenEntry);
+    // console.log(tokenEntry);
     // TODO: check if token exists and return error.
     return tokenService.insert(tokenEntry).catch(err => {
       throw err
@@ -127,7 +127,7 @@ router.post('/code_for_pswd', (req, res, next) => {
 })
 
 router.get('/:token', (req, res, next) => {
-  console.log('Params', req.params.token)
+  // console.log('Params', req.params.token)
   const {token} = req.params
 
   if (!token) {

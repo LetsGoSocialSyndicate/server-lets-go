@@ -15,11 +15,11 @@ const TokenService = require('../database/services/tokenService')
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
-  console.log('GET Event Feeds')
+  // console.log('GET Event Feeds')
   const eventService = new UserEventService()
   eventService.getAllEvents()
     .then((rows) => {
-      console.log('events', rows)
+      // console.log('events', rows)
       res.json(rows)
     })
     .catch((err) => next(err))
@@ -152,7 +152,7 @@ const sendNotification = (res, organizers, req) => {
 router.post('/request/:event_id', (req, res, next) => {
   const userEventService = new UserEventService()
   const eventService = new EventService()
-  console.log('post', req.params, req.user)
+  // console.log('post', req.params, req.user)
   const record = {
     event_id: req.params.event_id,
     requested_by: req.user.id,
@@ -163,7 +163,7 @@ router.post('/request/:event_id', (req, res, next) => {
       res.json(row)
       userEventService.getEventOrganizers(row.event_id)
         .then((organizers) => {
-          console.log('organizers', organizers)
+          // console.log('organizers', organizers)
           // send email to the organizer that a person has requested to join the event.
           sendNotification(res, organizers, req)
         })

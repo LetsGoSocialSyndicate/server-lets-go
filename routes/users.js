@@ -26,7 +26,7 @@ router.get('/', (req, res, next) => {
 })
 
 router.get('/:id', (req, res, next) => {
-  console.log('In router GET /users/:id:', req.params.id)
+  // console.log('In router GET /users/:id:', req.params.id)
   const userService = new UserService()
   userService.getById(req.params.id).then((row) => {
     res.json(row)
@@ -34,7 +34,7 @@ router.get('/:id', (req, res, next) => {
 })
 
 router.get('/:email/requested', (req, res, next) => {
-  console.log('In router GET: /users/requested', req.user)
+  // console.log('In router GET: /users/requested', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByParticipant(req.user.id).then((rows) => {
     res.json(rows)
@@ -42,7 +42,7 @@ router.get('/:email/requested', (req, res, next) => {
 })
 
 router.get('/:email/hosted', (req, res, next) => {
-  console.log('In router GET: /users/hosted', req.user)
+  // console.log('In router GET: /users/hosted', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOrganizer(req.user.id).then((rows) => {
     res.json(rows)
@@ -50,7 +50,7 @@ router.get('/:email/hosted', (req, res, next) => {
 })
 
 router.get('/:email/all', (req, res, next) => {
-  console.log('In router GET: /users/all', req.user)
+  // console.log('In router GET: /users/all', req.user)
   const userEventService = new UserEventService()
   Promise.all([
     userEventService.getAllEventsByParticipant(req.user.id),
@@ -63,7 +63,7 @@ router.get('/:email/all', (req, res, next) => {
 })
 
 router.get('/:email/others', (req, res, next) => {
-  console.log('In router GET: /users/others', req.user)
+  // console.log('In router GET: /users/others', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOtherOrganizer(req.user.id)
     .then((rows) => {
@@ -73,7 +73,7 @@ router.get('/:email/others', (req, res, next) => {
 })
 
 router.get('/:email/statistics', (req, res, next) => {
-  console.log('In router GET: /users/statistics', req.user)
+  // console.log('In router GET: /users/statistics', req.user)
   const userEventService = new UserEventService()
   Promise.all([
     userEventService.countEventsByParticipant(req.user.id),
@@ -84,7 +84,7 @@ router.get('/:email/statistics', (req, res, next) => {
         countJoined: rows[0].count,
         countHosted: rows[1].count
       }
-      console.log('All events statistics', statistics)
+      // console.log('All events statistics', statistics)
       res.json({ statistics })
     }).catch((err) => next(err))
 })
@@ -95,7 +95,7 @@ router.post('/', (req, res) => {
 
 router.patch('/:id', (req, res, next) => {
   // verifyToken middleware puts userId and email to request
-  console.log('users PATCH:', req.params, req.userId, req.email, req.body)
+  // console.log('users PATCH:', req.params, req.userId, req.email, req.body)
   const userService = new UserService()
   if (req.userId !== req.params.id) {
     next(boom.unauthorized('User ID does not match'))
@@ -109,7 +109,7 @@ router.patch('/:id', (req, res, next) => {
 
 router.patch('/:id/images', (req, res, next) => {
   // verifyToken middleware puts userId and email to request
-  console.log('users images PATCH start:', req.params, req.userId, req.email)
+  // console.log('users images PATCH start:', req.params, req.userId, req.email)
   if (req.userId !== req.params.id) {
     next(boom.unauthorized('User ID does not match'))
     return
@@ -123,7 +123,7 @@ router.patch('/:id/images', (req, res, next) => {
   const profileImageService = new ProfileImageService()
 
   const results = req.body.images.map(image => {
-    console.log('users images PATCH image:', getImageDescription(image))
+    // console.log('users images PATCH image:', getImageDescription(image))
     switch (image.op) {
     case IMAGE_OP_UPDATE: {
       const oldImagePromise =
@@ -159,7 +159,7 @@ router.patch('/:id/images', (req, res, next) => {
 
   Promise.all(results).then(() => {
     userService.getById(req.params.id).then((row) => {
-      console.log('users images PATCH returning:', row)
+      // console.log('users images PATCH returning:', row)
       res.json(row)
     }).catch((err) => next(err))
   })

@@ -5,11 +5,11 @@ const jwt = require('jsonwebtoken')
 const boom = require('boom')
 
 function handleResponse(op, email, httpRes, user) {
-  console.log('email: ', email)
+  // console.log('email: ', email)
   const token = jwt.sign({
     'email': email
   }, process.env.SECRET_KEY)
-  console.log('token: ', token)
+  // console.log('token: ', token)
   httpRes.setHeader('Set-Cookie', `token=${token};`)
 }
 
@@ -20,7 +20,7 @@ function noCaching(res) {
 // for Logged in request:
 function verifyToken(req, res, next) {
   const { authorization } = req.headers
-  console.log('verifyToken - authorization: ', authorization)
+  // console.log('verifyToken - authorization: ', authorization)
 
   try {
     if (!authorization) {
@@ -35,7 +35,7 @@ function verifyToken(req, res, next) {
         throw new Error('JWT token is invalid')
       }
       else {
-        console.log('decoded', decoded)
+        // console.log('decoded', decoded)
         req.email = decoded.email
         req.userId = decoded.userId
         next()

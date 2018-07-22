@@ -13,7 +13,7 @@ const {TOKEN_EXPIRED, ALREADY_VERIFIED, DATABASE_ERROR} = require('../utilities/
 const ONE_DAY = 1000 * 3600 * 24
 
 router.get('/:token', (req, res, next) => {
-  console.log('Params', req.params.token)
+  // console.log('Params', req.params.token)
   const {token} = req.params
 
   if (!token) {

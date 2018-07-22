@@ -42,17 +42,17 @@ const startChat = app => {
     const userService = new UserService()
     const profileImageService = new ProfileImageService()
     let sessionUserId = null
-    console.log('CHAT: A client just joined on', socket.id)
+    // console.log('CHAT: A client just joined on', socket.id)
 
     socket.on('disconnect', () => {
-      console.log('CHAT: user disconnected')
+      // console.log('CHAT: user disconnected')
       if (sessionUserId !== null && sessionUserId in sockets) {
         delete sockets[sessionUserId]
       }
     })
 
     socket.on(JOIN, (userId) => {
-      console.log('CHAT: user requested to join', userId)
+      // console.log('CHAT: user requested to join', userId)
       sessionUserId = userId
       sockets[sessionUserId] = socket.id
       // TODO: Add here last message or at least timestamp of last message
@@ -62,7 +62,7 @@ const startChat = app => {
     })
 
     socket.on(GET_PREVIOUS_MESSAGES, (userId, chatmateId) => {
-      console.log('CHAT: user requested previous messages', userId, chatmateId)
+      // console.log('CHAT: user requested previous messages', userId, chatmateId)
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
 
@@ -97,7 +97,7 @@ const startChat = app => {
     })
 
     socket.on(SEND_MESSAGE, (chatmateId, message) => {
-      console.log('CHAT: user sent message', message, 'to', chatmateId)
+      // console.log('CHAT: user sent message', message, 'to', chatmateId)
       const serverMessage = {
         id: message._id,
         message: message.text,
