@@ -1,10 +1,12 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
+/* eslint-disable no-underscore-dangle */
 const http = require('http')
 const socketio = require('socket.io')
 const MessageService = require('../database/services/messageService')
 const UserService = require('../database/services/userService')
+const ProfileImageService = require('../database/services/profileImageService')
 const {
   JOIN,
   GET_PREVIOUS_MESSAGES,
@@ -13,7 +15,6 @@ const {
   PREVIOUS_MESSAGES,
   MESSAGE
 } = require('./chatProtocol')
-const moment = require('moment')
 
 const getChatUserName =
   user => `${user.first_name} ${user.last_name.charAt(0)}`
@@ -26,6 +27,10 @@ const getChatUser = user => {
   }
 }
 
+const getAvatar = profileImages => {
+  return profileImages.length > 0 ? profileImages[0].image_url : null
+}
+
 const startChat = app => {
   const sockets = {}
   const server = http.Server(app)
@@ -35,6 +40,7 @@ const startChat = app => {
   websocket.on('connection', (socket) => {
     const messageService = new MessageService()
     const userService = new UserService()
+    const profileImageService = new ProfileImageService()
     let sessionUserId = null
     console.log('CHAT: A client just joined on', socket.id)
 
@@ -49,6 +55,7 @@ const startChat = app => {
       console.log('CHAT: user requested to join', userId)
       sessionUserId = userId
       sockets[sessionUserId] = socket.id
+      // TODO: Add here last message or at least timestamp of last message
       messageService.getChatMates(userId).then(chatmates => {
         socket.emit(CHATMATES, chatmates.map(chatmate => getChatUser(chatmate)))
       })
@@ -58,39 +65,43 @@ const startChat = app => {
       console.log('CHAT: user requested previous messages', userId, chatmateId)
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
-      userService.getById(userId, false).then(user => {
-        messageService.getMessages(userId, chatmateId).then(messages => {
-          const chatMessages = messages.map(message => {
-            const username = getChatUserName(
-              userId === message.sender ? user : message
-            )
-            return {
-              _id: message.id,
-              text: message.message,
-              createdAt: message.sent_at,
-              user: {
-                _id: message.sender,
-                name: username
-              }
-            }
-          })
-          // TODO: Make it more efficient than each time creating moment
-          const sortedChatMessages = chatMessages.sort(
-            // Use reverse order (b-a instead a-b) so that new messages
-            // appear at the bottom
-            (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
+
+      const userAvatarsPromise = profileImageService.getProfileImages(userId)
+      const chatmateAvatarsPromise = profileImageService.getProfileImages(chatmateId)
+      const userPromise = userService.getById(userId, false)
+      const messagesPromise = messageService.getMessages(userId, chatmateId)
+      Promise.all([
+        userAvatarsPromise, chatmateAvatarsPromise, userPromise, messagesPromise
+      ]).then(values => {
+        const [userAvatars, chatmateAvatars, user, messages] = values
+        const userAvatar = getAvatar(userAvatars)
+        const chatmateAvatar = getAvatar(chatmateAvatars)
+        const chatMessages = messages.map(message => {
+          const username = getChatUserName(
+            userId === message.sender ? user : message
           )
-          socket.emit(PREVIOUS_MESSAGES, sortedChatMessages)
+          const avatar = userId === message.sender ? userAvatar : chatmateAvatar
+          return {
+            _id: message.id,
+            text: message.message,
+            createdAt: message.sent_at,
+            user: {
+              _id: message.sender,
+              name: username,
+              avatar
+            }
+          }
         })
+        socket.emit(PREVIOUS_MESSAGES, chatmateId, chatMessages)
       })
     })
 
     socket.on(SEND_MESSAGE, (chatmateId, message) => {
       console.log('CHAT: user sent message', message, 'to', chatmateId)
       const serverMessage = {
-        id: message._id, // eslint-disable-line no-underscore-dangle
+        id: message._id,
         message: message.text,
-        sender: message.user._id, // eslint-disable-line no-underscore-dangle
+        sender: message.user._id,
         recipient: chatmateId,
         sent_at: message.createdAt
       }

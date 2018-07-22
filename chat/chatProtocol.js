@@ -34,8 +34,7 @@ const CHATMATES = 'chatmates'
 // Response to GET_PREVIOUS_MESSAGES request.
 // Sends message from current user to another chatmate.
 // Direction: Server -> Client
-// Params: [message, ...]
-// Params: message
+// Params: chatmateId, [message, ...]
 //         where message is { _id, text, createdAt, user}
 //         where user is {_id, name, avatar}
 const PREVIOUS_MESSAGES = 'previousMessages'

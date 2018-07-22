@@ -15,6 +15,20 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           sender: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
           recipient: 'e2aec1a1-60b4-46c0-8fb6-9bb663de862b',
           sent_at: '2018-07-17 15:53:42'
+        },
+        {
+          id: 'c83673e8-ccb0-485b-87af-e70ea4f04f64',
+          message: 'Are you up for skiing, Tanya?',
+          sender: '4201b6db-bde1-43c5-9245-5fd59ec2796b',
+          recipient: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
+          sent_at: '2018-07-19 17:53:42'
+        },
+        {
+          id: '98a74254-6472-49bc-a3e5-7449c7c0e05e',
+          message: 'Sure, but who will watch my kids?',
+          sender: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
+          recipient: '4201b6db-bde1-43c5-9245-5fd59ec2796b',
+          sent_at: '2018-07-19 17:53:49'
         }
       ])
     })
