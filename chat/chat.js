@@ -2,7 +2,6 @@
  * Copyright 2018, Socializing Syndicate Corp.
  */
 /* eslint-disable no-underscore-dangle */
-const http = require('http')
 const socketio = require('socket.io')
 const MessageService = require('../database/services/messageService')
 const UserService = require('../database/services/userService')
@@ -19,11 +18,16 @@ const {
 const getChatUserName =
   user => `${user.first_name} ${user.last_name.charAt(0)}`
 
-const getChatUser = user => {
+const getChatUser = entry => {
   return {
-    _id: user.id,
-    name: getChatUserName(user),
-    avatar: user.image_url
+    _id: entry.id,
+    name: getChatUserName(entry),
+    avatar: entry.image_url,
+    lastMessage: {
+      createdAt: entry.sent_at,
+      text: entry.message,
+      isIncoming: entry.is_incoming
+    }
   }
 }
 
@@ -31,11 +35,9 @@ const getAvatar = profileImages => {
   return profileImages.length > 0 ? profileImages[0].image_url : null
 }
 
-const startChat = app => {
+const startChat = server => {
   const sockets = {}
-  const server = http.Server(app)
   const websocket = socketio(server)
-  server.listen(8001, () => console.log('CHAT: listening on *:8001'))
 
   websocket.on('connection', (socket) => {
     const messageService = new MessageService()

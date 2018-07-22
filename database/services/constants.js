@@ -90,6 +90,7 @@ const MESSAGE_FIELDS_WITH_USERNAMES = [
 
 const CHAT_USERS_FIELDS = [
   'messages.sender as sender', 'messages.recipient as recipient',
+  'messages.message as message', 'messages.sent_at as sent_at',
   'users.first_name as first_name', 'users.last_name as last_name',
   'profile_images.image_url as image_url'
 ]

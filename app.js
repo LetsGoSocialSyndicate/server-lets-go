@@ -20,7 +20,6 @@ const startChat = require('./chat/chat')
 
 const app = express()
 app.disable('x-powered-by')
-startChat(app)
 
 app.use(logger('dev'))
 app.use(express.json({ limit: '20mb' }))
@@ -78,6 +77,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.json(err)
 })
 
-app.listen(8000, () => 'Server listens...')
+const server = app.listen(8000, () => 'Server listens...')
+startChat(server)
 
 module.exports = app

@@ -3,6 +3,7 @@
  */
 const knex = require('../../knex')
 const boom = require('boom')
+const moment = require('moment')
 const {
   messageTable,
   userTable,
@@ -11,16 +12,20 @@ const {
   CHAT_USERS_FIELDS
 } = require('./constants')
 
-
-const removeDuplicates = array => {
-  const ids = {}
-  return array.filter(entry => {
-    if (entry.id in ids) {
-      return false
+const dedupChatmates = array => {
+  const deduped = {}
+  array.forEach(entry => {
+    if (!(entry.id in deduped)) {
+      deduped[entry.id] = entry
+    } else {
+      const oldTimestamp = moment(deduped[entry.id].sent_at)
+      const newTimestamp = moment(entry.sent_at)
+      if (newTimestamp > oldTimestamp) {
+        deduped[entry.id] = entry
+      }
     }
-    ids[entry.id] = 1
-    return true
   })
+  return Object.values(deduped)
 }
 
 class MessageService {
@@ -52,7 +57,7 @@ class MessageService {
     }
     return Promise.all([
       this.getSenders(user_id), this.getRecipients(user_id)
-    ]).then(values => removeDuplicates(Array.prototype.concat(...values)))
+    ]).then(values => dedupChatmates(Array.prototype.concat(...values)))
   }
 
   getSenders(user_id) {
@@ -65,12 +70,15 @@ class MessageService {
       .leftJoin(profileImageTable, `${messageTable}.recipient`, `${profileImageTable}.user_id`)
       .where('recipient', user_id)
       .then(rows =>
-        removeDuplicates(rows.map(row => {
+        dedupChatmates(rows.map(row => {
           return {
             id: row.sender,
             first_name: row.first_name,
             last_name: row.last_name,
-            image_url: row.image_url
+            image_url: row.image_url,
+            message: row.message,
+            sent_at: row.sent_at,
+            is_incoming: true
           }
         }))
       )
@@ -90,12 +98,15 @@ class MessageService {
       .leftJoin(profileImageTable, `${messageTable}.recipient`, `${profileImageTable}.user_id`)
       .where('sender', user_id)
       .then(rows =>
-        removeDuplicates(rows.map(row => {
+        dedupChatmates(rows.map(row => {
           return {
             id: row.recipient,
             first_name: row.first_name,
             last_name: row.last_name,
-            image_url: row.image_url
+            image_url: row.image_url,
+            message: row.message,
+            sent_at: row.sent_at,
+            is_incoming: false
           }
         }))
       )
