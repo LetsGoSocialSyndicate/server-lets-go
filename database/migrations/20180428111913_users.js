@@ -7,17 +7,17 @@ const { userTable, universityTable } = require('../services/constants')
 exports.up = (knex, Promise) => {
   return knex.schema.createTable(userTable, (table) => {
     table.uuid('id')
-    table.varchar('first_name', 255).notNullable()
-    table.varchar('middle_name', 255).notNullable().defaultTo('')
-    table.varchar('last_name', 255).notNullable()
+    table.varchar('first_name', 30).notNullable()
+    table.varchar('middle_name', 30).notNullable().defaultTo('')
+    table.varchar('last_name', 30).notNullable()
     table.varchar('email', 255).notNullable()
-    table.varchar('role', 255).notNullable()
+    table.varchar('role', 30).notNullable()
     table.dateTime('verified_at').nullable()
     table.date('birthday').notNullable()
     table.specificType('hashed_password', 'CHAR(60)')
     // Gender is optional, but we will filter by gender
-    table.varchar('gender', 255).notNullable().defaultTo('')
-    table.text('about').notNullable().defaultTo('Describe yourself here...')
+    table.varchar('gender', 30).notNullable().defaultTo('')
+    table.varchar('about', 200).notNullable().defaultTo('Describe yourself here...')
 
     table.uuid('university_id').notNullable()
     table.timestamps(true, true)
