@@ -111,6 +111,7 @@ const startChat = server => {
         sent_at: message.createdAt,
         type: 'directChat'
       }
+      console.log('SEND_MESSAGE', chatmateId, message)
       messageService.insert(serverMessage).then(() => {
         if (chatmateId in sockets) {
           socket.to(sockets[chatmateId]).emit(MESSAGE, message)
