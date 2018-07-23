@@ -67,8 +67,13 @@ app.use((req, res, next) => {
 
 // error handler
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-  console.log('all-catch err: ', err)
-  // set locals, only providing error in development
+  // if (err.isBoom) {
+  //   const data = err.data ? err.data : {}
+  //   err = {...data, ...err.output.payload, status: err.output.statusCode}
+  // }
+  console.log('all-catch err:', err)
+
+  // set locals, only providng error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
 
