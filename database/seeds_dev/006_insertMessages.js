@@ -14,6 +14,7 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           message: 'Hey PanyaTanich, what`s up?',
           sender: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
           recipient: 'e2aec1a1-60b4-46c0-8fb6-9bb663de862b',
+          type: 'directChat',
           sent_at: '2018-07-17 15:53:42'
         },
         {
@@ -21,6 +22,7 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           message: 'Are you up for skiing, Tanya?',
           sender: '4201b6db-bde1-43c5-9245-5fd59ec2796b',
           recipient: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
+          type: 'directChat',
           sent_at: '2018-07-19 17:53:42'
         },
         {
@@ -28,6 +30,7 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           message: 'Sure, but who will watch my kids?',
           sender: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d',
           recipient: '4201b6db-bde1-43c5-9245-5fd59ec2796b',
+          type: 'directChat',
           sent_at: '2018-07-19 17:53:49'
         }
       ])
