@@ -67,7 +67,7 @@ class MessageService {
     return knex(messageTable)
       .select(CHAT_USERS_FIELDS)
       .innerJoin(userTable, `${messageTable}.sender`, `${userTable}.id`)
-      .leftJoin(profileImageTable, `${messageTable}.recipient`, `${profileImageTable}.user_id`)
+      .leftJoin(profileImageTable, `${messageTable}.sender`, `${profileImageTable}.user_id`)
       .where('recipient', user_id)
       .then(rows =>
         dedupChatmates(rows.map(row => {
@@ -190,7 +190,7 @@ class MessageService {
       })
       .catch((err) => {
         console.log('ERROR in MessageService.insert:', err)
-        throw err.isBoom ? err : boom.badImplementation(`Error inserting user profile image`)
+        throw err.isBoom ? err : boom.badImplementation(`Error inserting message`)
       })
   }
 

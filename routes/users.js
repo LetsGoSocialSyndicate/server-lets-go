@@ -5,10 +5,10 @@ const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
 const {
-  cloudinaryAddImage,
-  cloudinaryRemoveImage,
-  getImageDescription
+  cloudinaryForceAddImage,
+  cloudinaryRemoveImage
 } = require('../utilities/cloudinary')
+const multiparty = require('multiparty')
 
 const router = express.Router()
 
@@ -55,11 +55,13 @@ router.get('/:email/all', (req, res, next) => {
   Promise.all([
     userEventService.getAllEventsByParticipant(req.user.id),
     userEventService.getAllEventsByOrganizer(req.user.id)
-  ])
-    .then((rows) => {
-      // console.log('All events', [...rows[0], ...rows[1]])
-      res.json([...rows[0], ...rows[1]])
-    }).catch((err) => next(err))
+  ]).then((rows) => {
+    // console.log('All events', [...rows[0], ...rows[1]])
+    res.json([...rows[0], ...rows[1]])
+  }).catch((err) => {
+    //console.log('ERR:', err)
+    next(err)
+  })
 })
 
 router.get('/:email/others', (req, res, next) => {
@@ -78,15 +80,14 @@ router.get('/:email/statistics', (req, res, next) => {
   Promise.all([
     userEventService.countEventsByParticipant(req.user.id),
     userEventService.countEventsByOrganizer(req.user.id)
-  ])
-    .then((rows) => {
-      const statistics = {
-        countJoined: rows[0].count,
-        countHosted: rows[1].count
-      }
-      // console.log('All events statistics', statistics)
-      res.json({ statistics })
-    }).catch((err) => next(err))
+  ]).then((rows) => {
+    const statistics = {
+      countJoined: rows[0].count,
+      countHosted: rows[1].count
+    }
+    // console.log('All events statistics', statistics)
+    res.json({ statistics })
+  }).catch((err) => next(err))
 })
 
 router.post('/', (req, res) => {
@@ -107,66 +108,86 @@ router.patch('/:id', (req, res, next) => {
   }).catch((err) => next(err))
 })
 
-router.patch('/:id/images', (req, res, next) => {
+router.post('/:id/images', (req, res, next) => {
   // verifyToken middleware puts userId and email to request
-  // console.log('users images PATCH start:', req.params, req.userId, req.email)
+  // console.log('users images POST start:', req.params, req.userId, req.email)
   if (req.userId !== req.params.id) {
     next(boom.unauthorized('User ID does not match'))
     return
   }
-  if (!('images' in req.body) || req.body.images.length <= 0) {
-    next(boom.unauthorized('No valid images provided'))
-    return
-  }
 
-  const userService = new UserService()
-  const profileImageService = new ProfileImageService()
-
-  const results = req.body.images.map(image => {
-    // console.log('users images PATCH image:', getImageDescription(image))
-    switch (image.op) {
-    case IMAGE_OP_UPDATE: {
-      const oldImagePromise =
-        profileImageService.getProfileImageDetails(image.id)
-      // NOTE: Maybe it is possible here to do "Add with overwrite",
-      // instead "Add and delete".
-      return cloudinaryAddImage(image).then(cloudinaryImage => {
-        return oldImagePromise.then(oldImage => {
-          return profileImageService.update(cloudinaryImage).then(
-            () => cloudinaryRemoveImage(oldImage)
-          )
-        })
-      })
+  const form = new multiparty.Form()
+  form.parse(req, (err, fields, files) => {
+    const images = []
+    Object.entries(fields).forEach(
+      ([key, value]) => {
+        if (!files[key]) {
+          next(boom.badRequest(`Image file for entry ${key} not found`))
+          return
+        }
+        const image = JSON.parse(value[0])
+        image.image_url = files[key][0].path
+        images.push(image)
+      }
+    )
+    if (images.length === 0) {
+      next(boom.badRequest('No valid images provided'))
+      return
     }
-    case IMAGE_OP_ADD:
-      return cloudinaryAddImage(image).then(cloudinaryImage => {
-        return profileImageService.insert(
-          req.user, cloudinaryImage.image_url, cloudinaryImage.public_id
-        )
-      })
-    case IMAGE_OP_DELETE:
-      return profileImageService.getProfileImageDetails(
-        image.id
-      ).then(oldImage => {
-        return profileImageService.delete(oldImage.id).then(
-          () => cloudinaryRemoveImage(oldImage)
-        )
-      })
-    default:
-      return Promise.resolve()
-    }
-  })
 
-  Promise.all(results).then(() => {
-    userService.getById(req.params.id).then((row) => {
-      // console.log('users images PATCH returning:', row)
-      res.json(row)
-    }).catch((err) => next(err))
+    const userService = new UserService()
+    const profileImageService = new ProfileImageService()
+
+    const results = images.map(
+      image => processImageOpRequest(profileImageService, req.user, image)
+    )
+
+    Promise.all(results).then(() => {
+      userService.getById(req.params.id).then((row) => {
+        // console.log('users images POST returning:', row)
+        res.json(row)
+      }).catch((localErr) => next(localErr))
+    })
   })
 })
 
 router.delete('/:email', (req, res) => {
   res.send('respond with a resource')
 })
+
+const processImageOpRequest = (profileImageService, user, image) => {
+  // console.log('users processImageOpRequest:', getImageDescription(image))
+  switch (image.op) {
+  case IMAGE_OP_UPDATE: {
+    const oldImagePromise =
+      profileImageService.getProfileImageDetails(image.id)
+    // NOTE: Maybe it is possible here to do "Add with overwrite",
+    // instead "Add and delete".
+    return cloudinaryForceAddImage(image).then(cloudinaryImage => {
+      return oldImagePromise.then(oldImage => {
+        return profileImageService.update(cloudinaryImage).then(
+          () => cloudinaryRemoveImage(oldImage)
+        )
+      })
+    })
+  }
+  case IMAGE_OP_ADD:
+    return cloudinaryForceAddImage(image).then(cloudinaryImage => {
+      return profileImageService.insert(
+        user, cloudinaryImage.image_url, cloudinaryImage.public_id
+      )
+    })
+  case IMAGE_OP_DELETE:
+    return profileImageService.getProfileImageDetails(
+      image.id
+    ).then(oldImage => {
+      return profileImageService.delete(oldImage.id).then(
+        () => cloudinaryRemoveImage(oldImage)
+      )
+    })
+  default:
+    return Promise.resolve()
+  }
+}
 
 module.exports = router

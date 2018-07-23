@@ -35,13 +35,15 @@ const SEND_JOIN_REQUEST = 'sendJoinRequest'
 // Sends list of users with which current user had conversations.
 // Direction: Server -> Client
 // Params: [user, ...]
-//         where user is {_id, name, avatar}
+//         where user is {_id, name, avatar, lastMessage}
+//         where lastMessage is {createdAt, text, isIncoming, type}
 const CHATMATES = 'chatmates'
 
 // Response to GET_PREVIOUS_MESSAGES request.
 // Sends message from current user to another chatmate.
 // Direction: Server -> Client
-// Params: chatmateId, [message, ...]
+// Params: chatmate, [message, ...]
+//         where chatmate is {_id, name, avatar}
 //         where message is { _id, text, createdAt, user}
 //         where user is {_id, name, avatar}
 const PREVIOUS_MESSAGES = 'previousMessages'

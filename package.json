@@ -26,6 +26,7 @@
     "knex": "^0.14.6",
     "moment": "^2.22.2",
     "morgan": "~1.9.0",
+    "multiparty": "^4.1.4",
     "nodemailer": "^4.6.5",
     "pg": "^7.4.3",
     "socket.io": "^2.1.1",

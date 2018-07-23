@@ -5,7 +5,6 @@
 const socketio = require('socket.io')
 const MessageService = require('../database/services/messageService')
 const UserService = require('../database/services/userService')
-const ProfileImageService = require('../database/services/profileImageService')
 const {
   JOIN,
   GET_PREVIOUS_MESSAGES,
@@ -16,10 +15,14 @@ const {
   MESSAGE
 } = require('./chatProtocol')
 
+const getAvatar = user => {
+  return user.images.length > 0 ? user.images[0].image_url : null
+}
+
 const getChatUserName =
   user => `${user.first_name} ${user.last_name.charAt(0)}`
 
-const getChatUser = entry => {
+const getChatUserFromChatmate = entry => {
   return {
     _id: entry.id,
     name: getChatUserName(entry),
@@ -33,8 +36,13 @@ const getChatUser = entry => {
   }
 }
 
-const getAvatar = profileImages => {
-  return profileImages.length > 0 ? profileImages[0].image_url : null
+const getChatUserFromUser = user => {
+  return {
+    _id: user.id,
+    name: getChatUserName(user),
+    avatar: getAvatar(user),
+    lastMessage: null
+  }
 }
 
 const startChat = server => {
@@ -44,7 +52,6 @@ const startChat = server => {
   websocket.on('connection', (socket) => {
     const messageService = new MessageService()
     const userService = new UserService()
-    const profileImageService = new ProfileImageService()
     let sessionUserId = null
     // console.log('CHAT: A client just joined on', socket.id)
 
@@ -61,7 +68,11 @@ const startChat = server => {
       sockets[sessionUserId] = socket.id
       // TODO: Add here last message or at least timestamp of last message
       messageService.getChatMates(userId).then(chatmates => {
-        socket.emit(CHATMATES, chatmates.map(chatmate => getChatUser(chatmate)))
+        const chatUsers = chatmates.map(
+          chatmate => getChatUserFromChatmate(chatmate)
+        )
+        // console.log('CHAT: JOIN', chatUsers)
+        socket.emit(CHATMATES, chatUsers)
       })
     })
 
@@ -70,16 +81,13 @@ const startChat = server => {
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
 
-      const userAvatarsPromise = profileImageService.getProfileImages(userId)
-      const chatmateAvatarsPromise = profileImageService.getProfileImages(chatmateId)
-      const userPromise = userService.getById(userId, false)
+      const userPromise = userService.getById(userId)
+      const chatmatePromise = userService.getById(chatmateId)
       const messagesPromise = messageService.getMessages(userId, chatmateId)
-      Promise.all([
-        userAvatarsPromise, chatmateAvatarsPromise, userPromise, messagesPromise
-      ]).then(values => {
-        const [userAvatars, chatmateAvatars, user, messages] = values
-        const userAvatar = getAvatar(userAvatars)
-        const chatmateAvatar = getAvatar(chatmateAvatars)
+      Promise.all([userPromise, chatmatePromise, messagesPromise]).then(values => {
+        const [user, chatmate, messages] = values
+        const userAvatar = getAvatar(user)
+        const chatmateAvatar = getAvatar(chatmate)
         const chatMessages = messages.map(message => {
           const username = getChatUserName(
             userId === message.sender ? user : message
@@ -97,7 +105,13 @@ const startChat = server => {
             }
           }
         })
-        socket.emit(PREVIOUS_MESSAGES, chatmateId, chatMessages)
+        // console.log(
+        //   'CHAT: PREVIOUS_MESSAGES', getChatUserFromUser(chatmate),
+        //   chatMessages.legnth
+        // )
+        socket.emit(
+          PREVIOUS_MESSAGES, getChatUserFromUser(chatmate), chatMessages
+        )
       })
     })
 
@@ -111,7 +125,7 @@ const startChat = server => {
         sent_at: message.createdAt,
         type: 'directChat'
       }
-      console.log('SEND_MESSAGE', chatmateId, message)
+      // console.log('SEND_MESSAGE', chatmateId, message)
       messageService.insert(serverMessage).then(() => {
         if (chatmateId in sockets) {
           socket.to(sockets[chatmateId]).emit(MESSAGE, message)

@@ -17,6 +17,10 @@ const cloudinaryAddImage = image => {
       public_id: ''
     })
   }
+  return cloudinaryForceAddImage(image)
+}
+
+const cloudinaryForceAddImage = image => {
   return cloudinary.v2.uploader.upload(
     image.image_url, { type: 'private' }
   ).then(response => {
@@ -35,7 +39,7 @@ const cloudinaryRemoveImage = image => {
   }
   return cloudinary.v2.uploader.destroy(
     image.public_id, { type: 'private' }
-  ).then(response => {
+  ).then(response => { // eslint-disable-line no-unused-vars
     // console.log('cloudinaryRemoveImage:', response)
     return {}
   })
@@ -51,5 +55,5 @@ const getImageDescription = image => {
 
 
 module.exports = {
-  cloudinaryAddImage, cloudinaryRemoveImage, getImageDescription
+  cloudinaryAddImage, cloudinaryForceAddImage, cloudinaryRemoveImage, getImageDescription
 }
