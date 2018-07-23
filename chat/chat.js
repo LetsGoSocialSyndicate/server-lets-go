@@ -10,6 +10,7 @@ const {
   JOIN,
   GET_PREVIOUS_MESSAGES,
   SEND_MESSAGE,
+  SEND_JOIN_REQUEST,
   CHATMATES,
   PREVIOUS_MESSAGES,
   MESSAGE
@@ -64,7 +65,7 @@ const startChat = server => {
     })
 
     socket.on(GET_PREVIOUS_MESSAGES, (userId, chatmateId) => {
-      // console.log('CHAT: user requested previous messages', userId, chatmateId)
+      console.log('CHAT: user requested previous messages', userId, chatmateId)
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
 
@@ -99,13 +100,33 @@ const startChat = server => {
     })
 
     socket.on(SEND_MESSAGE, (chatmateId, message) => {
-      // console.log('CHAT: user sent message', message, 'to', chatmateId)
+      console.log('CHAT: user sent message', message, 'to', chatmateId)
       const serverMessage = {
         id: message._id,
         message: message.text,
         sender: message.user._id,
         recipient: chatmateId,
-        sent_at: message.createdAt
+        sent_at: message.createdAt,
+        type: 'directChat'
+      }
+      messageService.insert(serverMessage).then(() => {
+        if (chatmateId in sockets) {
+          socket.to(sockets[chatmateId]).emit(MESSAGE, message)
+        } else {
+          console.log('CHAT WARNING: SEND_MESSAGE socked not found for', chatmateId)
+        }
+      })
+    })
+
+    socket.on(SEND_JOIN_REQUEST, (chatmateId, message) => {
+      console.log('Request to Join: user sent message', message, 'to', chatmateId)
+      const serverMessage = {
+        id: message._id,
+        message: message.text,
+        sender: message.user._id,
+        recipient: chatmateId,
+        sent_at: message.createdAt,
+        type: 'joinRequest'
       }
       messageService.insert(serverMessage).then(() => {
         if (chatmateId in sockets) {

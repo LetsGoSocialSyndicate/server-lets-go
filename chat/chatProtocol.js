@@ -23,6 +23,7 @@ const GET_PREVIOUS_MESSAGES = 'getPreviousMessages'
 //         where message is { _id, text, createdAt, user}
 //         where user is {_id, name, avatar}
 const SEND_MESSAGE = 'sendMessage'
+const SEND_JOIN_REQUEST = 'sendJoinRequest'
 
 // Response to JOIN request.
 // Sends list of users with which current user had conversations.
@@ -51,6 +52,7 @@ module.exports = {
   JOIN,
   GET_PREVIOUS_MESSAGES,
   SEND_MESSAGE,
+  SEND_JOIN_REQUEST,
   CHATMATES,
   PREVIOUS_MESSAGES,
   MESSAGE
