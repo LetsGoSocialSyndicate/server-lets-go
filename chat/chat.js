@@ -65,7 +65,7 @@ const startChat = server => {
     })
 
     socket.on(GET_PREVIOUS_MESSAGES, (userId, chatmateId) => {
-      console.log('CHAT: user requested previous messages', userId, chatmateId)
+      // console.log('CHAT: user requested previous messages', userId, chatmateId)
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
 
@@ -100,7 +100,7 @@ const startChat = server => {
     })
 
     socket.on(SEND_MESSAGE, (chatmateId, message) => {
-      console.log('CHAT: user sent message', message, 'to', chatmateId)
+      // console.log('CHAT: user sent message', message, 'to', chatmateId)
       const serverMessage = {
         id: message._id,
         message: message.text,

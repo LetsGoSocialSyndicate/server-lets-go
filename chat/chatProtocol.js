@@ -23,6 +23,12 @@ const GET_PREVIOUS_MESSAGES = 'getPreviousMessages'
 //         where message is { _id, text, createdAt, user}
 //         where user is {_id, name, avatar}
 const SEND_MESSAGE = 'sendMessage'
+
+// Sends 'request to join an activity' from current user to the host of the event.
+// Direction: Client -> Server
+// Params: userId, message
+//         where message is { _id, text, createdAt, user}
+//         where user is {_id, name, avatar}
 const SEND_JOIN_REQUEST = 'sendJoinRequest'
 
 // Response to JOIN request.
