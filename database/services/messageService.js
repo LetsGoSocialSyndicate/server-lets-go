@@ -78,7 +78,8 @@ class MessageService {
             image_url: row.image_url,
             message: row.message,
             sent_at: row.sent_at,
-            is_incoming: true
+            is_incoming: true,
+            message_type: row.message_type
           }
         }))
       )
@@ -106,7 +107,8 @@ class MessageService {
             image_url: row.image_url,
             message: row.message,
             sent_at: row.sent_at,
-            is_incoming: false
+            is_incoming: false,
+            message_type: row.message_type
           }
         }))
       )

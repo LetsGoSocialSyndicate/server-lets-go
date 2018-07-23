@@ -27,7 +27,8 @@ const getChatUser = entry => {
     lastMessage: {
       createdAt: entry.sent_at,
       text: entry.message,
-      isIncoming: entry.is_incoming
+      isIncoming: entry.is_incoming,
+      type: entry.message_type
     }
   }
 }
@@ -88,6 +89,7 @@ const startChat = server => {
             _id: message.id,
             text: message.message,
             createdAt: message.sent_at,
+            type: message.message_type,
             user: {
               _id: message.sender,
               name: username,
@@ -119,7 +121,7 @@ const startChat = server => {
     })
 
     socket.on(SEND_JOIN_REQUEST, (chatmateId, message) => {
-      console.log('Request to Join: user sent message', message, 'to', chatmateId)
+      // console.log('Request to Join: user sent message', message, 'to', chatmateId)
       const serverMessage = {
         id: message._id,
         message: message.text,
