@@ -1,6 +1,6 @@
 const { eventTable } = require('../services/constants')
 
-exports.seed = (knex, Promise) => {
+exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
   // Deletes ALL existing entries
   return knex(eventTable).del()
     .then(() => {
@@ -104,6 +104,15 @@ exports.seed = (knex, Promise) => {
           description: '',
           start_time: '2018-07-18 06:30:00',
           end_time: '2018-07-18 20:30:00'
+        },
+        {
+          id: '6cc6b661-31eb-4ede-8185-b7b592c450c2',
+          title: 'Jump',
+          location: 'Jump City',
+          category: 'Party',
+          description: 'simply jump',
+          start_time: '2018-09-26 07:51:00',
+          end_time: '2018-09-28 07:51:00'
         }
       ])
     })

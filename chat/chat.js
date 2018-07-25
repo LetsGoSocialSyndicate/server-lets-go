@@ -45,6 +45,31 @@ const getChatUserFromUser = user => {
   }
 }
 
+const getServerMessageFromMessage = (chatmateId, message) => {
+  return {
+    id: message._id,
+    message: message.text,
+    sender: message.user._id,
+    recipient: chatmateId,
+    sent_at: message.createdAt,
+    message_type: message.type
+  }
+}
+
+const getMessageFromServerMessage = (name, avatar, message) => {
+  return {
+    _id: message.id,
+    text: message.message,
+    createdAt: message.sent_at,
+    type: message.message_type,
+    user: {
+      _id: message.sender,
+      name,
+      avatar
+    }
+  }
+}
+
 const startChat = server => {
   const sockets = {}
   const websocket = socketio(server)
@@ -93,17 +118,7 @@ const startChat = server => {
             userId === message.sender ? user : message
           )
           const avatar = userId === message.sender ? userAvatar : chatmateAvatar
-          return {
-            _id: message.id,
-            text: message.message,
-            createdAt: message.sent_at,
-            type: message.message_type,
-            user: {
-              _id: message.sender,
-              name: username,
-              avatar
-            }
-          }
+          return getMessageFromServerMessage(username, avatar, message)
         })
         // console.log(
         //   'CHAT: PREVIOUS_MESSAGES', getChatUserFromUser(chatmate),
@@ -117,15 +132,7 @@ const startChat = server => {
 
     socket.on(SEND_MESSAGE, (chatmateId, message) => {
       // console.log('CHAT: user sent message', message, 'to', chatmateId)
-      const serverMessage = {
-        id: message._id,
-        message: message.text,
-        sender: message.user._id,
-        recipient: chatmateId,
-        sent_at: message.createdAt,
-        type: 'directChat'
-      }
-      // console.log('SEND_MESSAGE', chatmateId, message)
+      const serverMessage = getServerMessageFromMessage(chatmateId, message)
       messageService.insert(serverMessage).then(() => {
         if (chatmateId in sockets) {
           socket.to(sockets[chatmateId]).emit(MESSAGE, message)
@@ -137,14 +144,8 @@ const startChat = server => {
 
     socket.on(SEND_JOIN_REQUEST, (chatmateId, message) => {
       // console.log('Request to Join: user sent message', message, 'to', chatmateId)
-      const serverMessage = {
-        id: message._id,
-        message: message.text,
-        sender: message.user._id,
-        recipient: chatmateId,
-        sent_at: message.createdAt,
-        type: 'joinRequest'
-      }
+      const serverMessage = getServerMessageFromMessage(chatmateId, message)
+      console.log('SEND_JOIN_REQUEST', chatmateId, message, serverMessage)
       messageService.insert(serverMessage).then(() => {
         if (chatmateId in sockets) {
           socket.to(sockets[chatmateId]).emit(MESSAGE, message)

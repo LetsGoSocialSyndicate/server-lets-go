@@ -20,14 +20,14 @@ const GET_PREVIOUS_MESSAGES = 'getPreviousMessages'
 // Sends message from current user to another chatmate.
 // Direction: Client -> Server
 // Params: userId, message
-//         where message is { _id, text, createdAt, user}
+//         where message is { _id, text, createdAt, type, user}
 //         where user is {_id, name, avatar}
 const SEND_MESSAGE = 'sendMessage'
 
 // Sends 'request to join an activity' from current user to the host of the event.
 // Direction: Client -> Server
 // Params: userId, message
-//         where message is { _id, text, createdAt, user}
+//         where message is { _id, text, createdAt, type, user}
 //         where user is {_id, name, avatar}
 const SEND_JOIN_REQUEST = 'sendJoinRequest'
 
@@ -44,7 +44,7 @@ const CHATMATES = 'chatmates'
 // Direction: Server -> Client
 // Params: chatmate, [message, ...]
 //         where chatmate is {_id, name, avatar}
-//         where message is { _id, text, createdAt, user}
+//         where message is { _id, text, createdAt, type, user}
 //         where user is {_id, name, avatar}
 const PREVIOUS_MESSAGES = 'previousMessages'
 
@@ -52,9 +52,14 @@ const PREVIOUS_MESSAGES = 'previousMessages'
 // Dispatches message from current user to another chatmate.
 // Direction: Server -> Client
 // Params: message
-//         where message is { _id, text, createdAt, user}
+//         where message is { _id, text, createdAt, type, user}
 //         where user is {_id, name, avatar}
 const MESSAGE = 'message'
+
+
+// Types of messages
+const MESSAGE_TYPE_CHAT = 'chat'
+const MESSAGE_TYPE_JOIN_REQUEST = 'joinRequest'
 
 module.exports = {
   JOIN,
@@ -63,5 +68,7 @@ module.exports = {
   SEND_JOIN_REQUEST,
   CHATMATES,
   PREVIOUS_MESSAGES,
-  MESSAGE
+  MESSAGE,
+  MESSAGE_TYPE_CHAT,
+  MESSAGE_TYPE_JOIN_REQUEST
 }

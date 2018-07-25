@@ -9,7 +9,7 @@ exports.up = (knex, Promise) => { // eslint-disable-line no-unused-vars
     table.text('message').notNullable().defaultTo('')
     table.dateTime('sent_at').notNullable()
 
-    table.varchar('type', 20).notNullable()
+    table.varchar('message_type', 20).notNullable()
     table.uuid('sender')
     table.uuid('recipient')
     table.foreign('sender').references('id').inTable(userTable).onDelete('cascade')

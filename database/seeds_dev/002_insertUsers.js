@@ -116,6 +116,19 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
           gender: 'female',
           birthday: '1997-09-11',
           university_id: UUID_UNIVERSITY_OF_COLORADO
+        },
+        {
+          id: 'e59b9aba-a802-492f-ba6f-c3290f42d4c1',
+          first_name: 'Tester',
+          middle_name: '',
+          last_name: 'Choice',
+          email: 'panich.photos3+2@gmail.com',
+          verified_at: '2018-07-25',
+          role: USER_ROLE_REGULAR,
+          hashed_password: '$2b$08$wWWN7io3KsE1PldPQ4Bide9DJcsNCCuHJrC6GIYL7hNsp5bIr8UE2',
+          gender: 'male',
+          birthday: '1972-08-25',
+          university_id: UUID_UNIVERSITY_OF_COLORADO
         }
       ])
     })

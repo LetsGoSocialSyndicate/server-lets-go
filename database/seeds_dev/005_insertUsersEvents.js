@@ -3,7 +3,7 @@
  */
 const { userEventTable } = require('../services/constants')
 
-exports.seed = (knex, Promise) => {
+exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
   // Deletes ALL existing entries
   return knex(userEventTable).del()
     .then(() => {
@@ -173,6 +173,11 @@ exports.seed = (knex, Promise) => {
           id: 'bf844f89-5320-4edc-baa8-b27dc727f59c',
           event_id: 'c57af163-04a6-40a2-9d9e-2861f3d3a7b7',
           requested_by: '8ed01d49-b0c7-4a4b-941a-fad2c346d9b4'
+        },
+        { // organizer
+          id: 'b192abb6-cd5a-46bd-87a4-9163113ba916',
+          event_id: '6cc6b661-31eb-4ede-8185-b7b592c450c2',
+          posted_by: 'a9e6d36c-9ecb-408a-a4e4-e5893fa4154d'
         }
       ])
     })
