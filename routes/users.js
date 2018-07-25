@@ -68,7 +68,7 @@ router.get('/:id/all', (req, res, next) => {
     outImages.forEach(image => {
       for (let event of outEvents) {
         //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
-        if (event.user_id === image.user_id) {
+        if (event.event_id === image.event_id) {
           if (event.images) {
             console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
             event.images.push(toImageProps(image))

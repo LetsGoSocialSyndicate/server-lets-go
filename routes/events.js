@@ -247,6 +247,7 @@ router.post('/:user_id/:event_id/images', (req, res, next) => {
           return
         }
         const image = JSON.parse(value[0])
+
         image.image_url = files[key][0].path
         images.push(image)
       }
@@ -271,7 +272,7 @@ router.post('/:user_id/:event_id/images', (req, res, next) => {
         outImages.forEach(image => {
           for (let event of outEvents) {
             //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
-            if (event.user_id === image.user_id) {
+            if (event.event_id === image.event_id) {
               if (event.images) {
                 console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
                 event.images.push(toImageProps(image))
