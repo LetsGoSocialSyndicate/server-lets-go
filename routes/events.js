@@ -3,16 +3,37 @@
  */
 const express = require('express')
 const router = express.Router()
-const EventService = require('../database/services/eventService')
-const UserEventService = require('../database/services/userEventService')
-const { SENDING_MAIL_ERROR } = require('../utilities/constants')
-const { constructSuccess, constructFailure, invalidInput } = require('../utilities/routeUtil')
-const { sendEmail } = require('../utilities/mailUtils')
-
 const crypto = require('crypto')
 const UserService = require('../database/services/userService')
 const TokenService = require('../database/services/tokenService')
+const EventService = require('../database/services/eventService')
+const UserEventService = require('../database/services/userEventService')
+const MomentImageService = require('../database/services/momentImageService')
+const multiparty = require('multiparty')
 
+const { SENDING_MAIL_ERROR } = require('../utilities/constants')
+const { sendEmail } = require('../utilities/mailUtils')
+const {
+  cloudinaryForceAddImage,
+  cloudinaryRemoveImage
+} = require('../utilities/cloudinary')
+const {
+  constructSuccess,
+  constructFailure,
+  invalidInput
+} = require('../utilities/routeUtil')
+
+// NOTE: These constants should match client side
+const IMAGE_OP_UPDATE = 'IMAGE_OP_UPDATE'
+const IMAGE_OP_ADD = 'IMAGE_OP_ADD'
+const IMAGE_OP_DELETE = 'IMAGE_OP_DELETE'
+
+const toImageProps = image => {
+  return {
+    id: image.id,
+    image_url: image.image_url
+  }
+}
 /* GET event listing. */
 router.get('/', (req, res, next) => {
   // console.log('GET Event Feeds')
@@ -210,5 +231,97 @@ router.patch('/reject/:request_id', (req, res, next) => {
     })
     .catch((err) => next(err))
 })
+
+// router.post('/:id/images', (req, res, next) => {
+router.post('/:user_id/:event_id/images', (req, res, next) => {
+  console.log('EVENT ID: req.params.event_id:', req.params.event_id)
+  console.log('USER ID: req.params.id:', req.params.user_id)
+
+  const form = new multiparty.Form()
+  form.parse(req, (err, fields, files) => {
+    const images = []
+    Object.entries(fields).forEach(
+      ([key, value]) => {
+        if (!files[key]) {
+          next(boom.badRequest(`Image file for entry ${key} not found`))
+          return
+        }
+        const image = JSON.parse(value[0])
+        image.image_url = files[key][0].path
+        images.push(image)
+      }
+    )
+    if (images.length === 0) {
+      next(boom.badRequest('No valid images provided'))
+      return
+    }
+
+    const userEventService = new UserEventService()
+    const momentImageService = new MomentImageService()
+
+    const results = images.map(
+      image => processImageOpRequest(momentImageService, req.params.event_id, req.params.user_id, image)
+    )
+
+    Promise.all(results).then(() => {
+      const imagesPromise = momentImageService.getAllUserImages(req.params.user_id)
+      const eventsPromise = userEventService.getAllUserEvents(req.params.user_id)
+      Promise.all([imagesPromise, eventsPromise]).then(values => {
+        const [outImages, outEvents] = values
+        outImages.forEach(image => {
+          for (let event of outEvents) {
+            //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
+            if (event.user_id === image.user_id) {
+              if (event.images) {
+                console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
+                event.images.push(toImageProps(image))
+              } else {
+                console.log('ADDING FIRST IMAGE:', event.event_title, event.first_name, image)
+                event.images = [toImageProps(image)]
+              }
+            }
+          }
+        })
+        console.log('event images POST returning:', outEvents)
+        res.json(outEvents)
+      }).catch((localErr) => next(localErr))
+    })
+  })
+})
+
+const processImageOpRequest = (momentImageService, eventId, userId, image) => {
+  console.log('event processImageOpRequest:', eventId, userId, image)
+  switch (image.op) {
+  case IMAGE_OP_UPDATE: {
+    const oldImagePromise =
+      momentImageService.getMomentImageDetails(image.id)
+    // NOTE: Maybe it is possible here to do "Add with overwrite",
+    // instead "Add and delete".
+    return cloudinaryForceAddImage(image).then(cloudinaryImage => {
+      return oldImagePromise.then(oldImage => {
+        return momentImageService.update(cloudinaryImage).then(
+          () => cloudinaryRemoveImage(oldImage)
+        )
+      })
+    })
+  }
+  case IMAGE_OP_ADD:
+    return cloudinaryForceAddImage(image).then(cloudinaryImage => {
+      return momentImageService.insert(
+        eventId, userId, cloudinaryImage.image_url, cloudinaryImage.public_id
+      )
+    })
+  case IMAGE_OP_DELETE:
+    return momentImageService.getMomentImageDetails(
+      image.id
+    ).then(oldImage => {
+      return momentImageService.delete(oldImage.id).then(
+        () => cloudinaryRemoveImage(oldImage)
+      )
+    })
+  default:
+    return Promise.resolve()
+  }
+}
 
 module.exports = router

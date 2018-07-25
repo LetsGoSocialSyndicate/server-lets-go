@@ -3,10 +3,16 @@ const cloudinary = require('cloudinary')
 
 const DATA_URI_PREFIX = 'data:'
 
+// cloudinary.v2.config({
+//   cloud_name: process.env.CLOUDINARY_LOGIN,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET
+// })
+
 cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_LOGIN,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: 'socializing-syndicate-corporation',
+  api_key: '913593798195128',
+  api_secret: 'g497fM5M640LUpl6aejlb3m_Ymo'
 })
 
 const cloudinaryAddImage = image => {

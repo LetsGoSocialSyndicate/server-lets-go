@@ -5,7 +5,7 @@ const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS } = require('./constants')
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { userTable } = require('./constants')
+const { userTable, momentImageTable } = require('./constants')
 const ProfileImageService = require('./profileImageService')
 
 const mergeProfileImages = (user) => {

@@ -28,6 +28,14 @@ class UserEventService {
       })
   }
 
+  getAllUserEvents(userId) {
+    console.log('getAllUserEvents', userId)
+    return Promise.all([
+      this.getAllEventsByParticipant(userId),
+      this.getAllEventsByOrganizer(userId)
+    ]).then(rows => [...rows[0], ...rows[1]])
+  }
+
   getEventById(user_event_id) {
     if (!user_event_id) {
       throw boom.badRequest('User-Event id is required')
@@ -54,6 +62,7 @@ class UserEventService {
   }
 
   getAllEventsByParticipant(userId) {
+    console.log('getAllEventsByParticipant', userId)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
@@ -78,6 +87,7 @@ class UserEventService {
   }
 
   getAllEventsByOrganizer(userId) {
+    console.log('getAllEventsByOrganizer', userId)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }

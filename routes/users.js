@@ -4,6 +4,7 @@ const express = require('express')
 const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
+const MomentImageService = require('../database/services/momentImageService')
 const {
   cloudinaryForceAddImage,
   cloudinaryRemoveImage
@@ -16,6 +17,13 @@ const router = express.Router()
 const IMAGE_OP_UPDATE = 'IMAGE_OP_UPDATE'
 const IMAGE_OP_ADD = 'IMAGE_OP_ADD'
 const IMAGE_OP_DELETE = 'IMAGE_OP_DELETE'
+
+const toImageProps = image => {
+  return {
+    id: image.id,
+    image_url: image.image_url
+  }
+}
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -52,12 +60,27 @@ router.get('/:email/hosted', (req, res, next) => {
 router.get('/:id/all', (req, res, next) => {
   // console.log('In router GET: /users/all', req.params)
   const userEventService = new UserEventService()
-  Promise.all([
-    userEventService.getAllEventsByParticipant(req.params.id),
-    userEventService.getAllEventsByOrganizer(req.params.id)
-  ]).then((rows) => {
-    // console.log('All events', [...rows[0], ...rows[1]])
-    res.json([...rows[0], ...rows[1]])
+  const momentImageService = new MomentImageService()
+  const imagesPromise = momentImageService.getAllUserImages(req.params.id)
+  const eventsPromise = userEventService.getAllUserEvents(req.params.id)
+  Promise.all([imagesPromise, eventsPromise]).then(values => {
+    const [outImages, outEvents] = values
+    outImages.forEach(image => {
+      for (let event of outEvents) {
+        //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
+        if (event.user_id === image.user_id) {
+          if (event.images) {
+            console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
+            event.images.push(toImageProps(image))
+          } else {
+            console.log('ADDING FIRST IMAGE:', event.event_title, event.first_name, image)
+            event.images = [toImageProps(image)]
+          }
+        }
+      }
+    })
+    console.log('event images POST returning:', outEvents)
+    res.json(outEvents)
   }).catch((err) => {
     //console.log('ERR:', err)
     next(err)
