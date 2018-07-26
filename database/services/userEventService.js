@@ -4,8 +4,9 @@
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
+const moment = require('moment')
 const { userTable, eventTable, userEventTable, profileImageTable,
-  USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS
+  USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS, DATETIME_FORMAT
 } = require('./constants')
 
 class UserEventService {
@@ -66,6 +67,9 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
+    const startTime = moment().format(DATETIME_FORMAT)
+    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
+    console.log('endTime', endTime)
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -73,6 +77,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
+      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -91,12 +96,15 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
+    const startTime = moment().format(DATETIME_FORMAT)
+    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
+      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -114,12 +122,15 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
+    const startTime = moment().format(DATETIME_FORMAT)
+    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .whereNot(`${userTable}.id`, userId)
+      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -137,12 +148,15 @@ class UserEventService {
     if (!eventId) {
       throw boom.badRequest('Event id is required')
     }
+    const startTime = moment().format(DATETIME_FORMAT)
+    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
     return knex(eventTable)
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .innerJoin(userTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
+      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {

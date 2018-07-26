@@ -15,6 +15,10 @@ const messageTable = 'messages'
 const UUID_UNIVERSITY_OF_COLORADO = 'a8471c7a-16c4-480d-8c2b-ce05af92417d'
 const DEFAULT_USER_PROFILE_IMAGE = 'https://akilezwebsolutions.com/wp-content/uploads/avatar-7.png'
 
+const DATE_FORMAT = 'YYYY-MM-DD'
+const TIME_FORMAT = 'HH:mm'
+const DATETIME_FORMAT = `${DATE_FORMAT} ${TIME_FORMAT}`
+
 const USER_ROLE_ADMIN = 'admin'
 const USER_ROLE_REGULAR = 'regular'
 
@@ -107,6 +111,7 @@ module.exports = {
   MESSAGE_FIELDS_WITH_USERNAMES,
   DEFAULT_USER_PROFILE_IMAGE,
   CHAT_USERS_FIELDS,
+  DATETIME_FORMAT,
   universityTable,
   userTable,
   eventTable,
