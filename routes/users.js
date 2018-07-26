@@ -57,6 +57,44 @@ router.get('/:email/hosted', (req, res, next) => {
   }).catch((err) => next(err))
 })
 
+const getMyActivities = (done, req, res, next) => {
+  // console.log('In router GET: /users/all', req.params)
+  const userEventService = new UserEventService()
+  const momentImageService = new MomentImageService()
+  const imagesPromise = momentImageService.getAllUserImages(req.params.id)
+  const eventsPromise = userEventService.getAllUserEvents(req.params.id, done)
+  Promise.all([imagesPromise, eventsPromise]).then(values => {
+    const [outImages, outEvents] = values
+    outImages.forEach(image => {
+      for (let event of outEvents) {
+        //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
+        if (event.event_id === image.event_id) {
+          if (event.images) {
+            console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
+            event.images.push(toImageProps(image))
+          } else {
+            console.log('ADDING FIRST IMAGE:', event.event_title, event.first_name, image)
+            event.images = [toImageProps(image)]
+          }
+        }
+      }
+    })
+    // console.log('event images POST returning:', outEvents)
+    res.json(outEvents)
+  }).catch((err) => {
+    //console.log('ERR:', err)
+    next(err)
+  })
+}
+
+router.get('/:id/new', (req, res, next) => {
+  getMyActivities(false, req, res, next)
+})
+
+router.get('/:id/old', (req, res, next) => {
+  getMyActivities(true, req, res, next)
+})
+
 router.get('/:id/all', (req, res, next) => {
   // console.log('In router GET: /users/all', req.params)
   const userEventService = new UserEventService()

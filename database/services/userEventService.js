@@ -9,6 +9,8 @@ const { userTable, eventTable, userEventTable, profileImageTable,
   USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS, DATETIME_FORMAT
 } = require('./constants')
 
+const END_OF_TIME = '2018 07 01 00:00:00'
+
 class UserEventService {
   getAllEvents() {
     return knex(userTable)
@@ -24,16 +26,16 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('getAllEvents: err', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
-  getAllUserEvents(userId) {
+  getAllUserEvents(userId, done = false) {
     console.log('getAllUserEvents', userId)
     return Promise.all([
-      this.getAllEventsByParticipant(userId),
-      this.getAllEventsByOrganizer(userId)
+      this.getAllEventsByParticipant(userId, done),
+      this.getAllEventsByOrganizer(userId, done)
     ]).then(rows => [...rows[0], ...rows[1]])
   }
 
@@ -57,19 +59,23 @@ class UserEventService {
         throw boom.notFound(`No user-event record found for the id, ${user_event_id}`)
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('getEventById: err', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
-  getAllEventsByParticipant(userId) {
-    console.log('getAllEventsByParticipant', userId)
+  getAllEventsByParticipant(userId, done = false) {
+    console.log('getAllEventsByParticipant', userId, done)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const startTime = moment().format(DATETIME_FORMAT)
-    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
-    console.log('endTime', endTime)
+    const now = moment()
+    let startTime = now.format(DATETIME_FORMAT)
+    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
+    if (done) {
+      endTime = startTime
+      startTime = END_OF_TIME
+    }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -91,13 +97,18 @@ class UserEventService {
       })
   }
 
-  getAllEventsByOrganizer(userId) {
-    console.log('getAllEventsByOrganizer', userId)
+  getAllEventsByOrganizer(userId, done = false) {
+    console.log('getAllEventsByOrganizer', userId, done)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const startTime = moment().format(DATETIME_FORMAT)
-    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
+    const now = moment()
+    let startTime = now.format(DATETIME_FORMAT)
+    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
+    if (done) {
+      endTime = startTime
+      startTime = END_OF_TIME
+    }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -113,17 +124,22 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('getAllEventsByOrganizer: err', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
-  getAllEventsByOtherOrganizer(userId) {
+  getAllEventsByOtherOrganizer(userId, done = false) {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const startTime = moment().format(DATETIME_FORMAT)
-    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
+    const now = moment()
+    let startTime = now.format(DATETIME_FORMAT)
+    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
+    if (done) {
+      endTime = startTime
+      startTime = END_OF_TIME
+    }
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -139,17 +155,22 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('getAllEventsByOtherOrganizer: err', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
-  getEventOrganizers(eventId) {
+  getEventOrganizers(eventId, done = false) {
     if (!eventId) {
       throw boom.badRequest('Event id is required')
     }
-    const startTime = moment().format(DATETIME_FORMAT)
-    const endTime = moment().add(3, 'd').format(DATETIME_FORMAT);
+    const now = moment()
+    let startTime = now.format(DATETIME_FORMAT)
+    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
+    if (done) {
+      endTime = startTime
+      startTime = END_OF_TIME
+    }
     return knex(eventTable)
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
@@ -165,7 +186,7 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('getEventOrganizers: err', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
