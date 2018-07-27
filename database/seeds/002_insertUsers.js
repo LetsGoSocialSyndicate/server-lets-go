@@ -58,22 +58,6 @@ exports.seed = (knex, Promise) => {
           updated_at: '2018-07-24 00:36:04.237114+00'
         },
         {
-          id: '2ccd2b08-33a7-4210-aaa2-e7cd265c8859',
-          first_name: 'Panya',
-          middle_name: '',
-          last_name: 'Tanich',
-          email: 'panich.photos3+1@gmail.com',
-          role: USER_ROLE_REGULAR,
-          verified_at: '2018-07-24 00:00:00+00',
-          birthday: '1991-06-09',
-          hashed_password: '00b$08$mzmuD4me7hRNhckgPU16l.ThbN.MgSu7E7iTLQgNopW0I.9687Eca',
-          gender: 'female',
-          about: 'Describe yourself here...',
-          university_id: UUID_UNIVERSITY_OF_COLORADO,
-          created_at: '2018-07-24 01:09:24.163772+00',
-          updated_at: '2018-07-24 01:09:24.163772+00'
-        },
-        {
           id: 'cf1dc34c-6cc2-492a-83fa-e717c141c098',
           first_name: 'Tanya',
           middle_name: '',
