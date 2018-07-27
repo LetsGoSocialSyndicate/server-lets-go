@@ -61,5 +61,8 @@ const getImageDescription = image => {
 
 
 module.exports = {
-  cloudinaryAddImage, cloudinaryForceAddImage, cloudinaryRemoveImage, getImageDescription
+  cloudinaryAddImage,
+  cloudinaryForceAddImage,
+  cloudinaryRemoveImage,
+  getImageDescription
 }
