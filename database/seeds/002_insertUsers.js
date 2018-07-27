@@ -106,7 +106,7 @@ exports.seed = (knex, Promise) => {
           updated_at: '2018-07-24 03:46:54.245344+00'
         },
         {
-          id: '364f481c-c7d9-4ea1-9741-c71579efda68',
+          id: 'da1a3087-d283-4415-88dc-1dc8fe7fc25f',
           first_name: 'Abby',
           middle_name: '',
           last_name: 'Black',
