@@ -106,22 +106,6 @@ exports.seed = (knex, Promise) => {
           updated_at: '2018-07-24 03:46:54.245344+00'
         },
         {
-          id: 'da1a3087-d283-4415-88dc-1dc8fe7fc25f',
-          first_name: 'Abby',
-          middle_name: '',
-          last_name: 'Black',
-          email: 'ziolkowstr08@uww.edu',
-          role: USER_ROLE_REGULAR,
-          verified_at: '2018-07-19 00:00:00+00',
-          birthday: '1993-06-08',
-          hashed_password: '00b$08$NFIG7QcGvh7VsUUHNgLndujvettp2jlbTBWHrJlCJXPQEfOIQ.s2.',
-          gender: 'male',
-          about: 'I’m an avid skier and cyclist who is studying accounting and finance. You can find me outside or at the library studying.',
-          university_id: UUID_UNIVERSITY_OF_COLORADO,
-          created_at: '2018-07-19 14:08:03.958573+00',
-          updated_at: '2018-07-19 14:08:03.958573+00'
-        },
-        {
           id: 'fd0e9567-abe7-4a0b-968d-ca7b4821eebb',
           first_name: 'John',
           middle_name: '',
