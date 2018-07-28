@@ -1,6 +1,7 @@
 /* Copyright 2018, Socializing Syndicate Corp. */
 const boom = require('boom')
 const express = require('express')
+const multiparty = require('multiparty')
 const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
@@ -9,21 +10,15 @@ const {
   cloudinaryForceAddImage,
   cloudinaryRemoveImage
 } = require('../utilities/cloudinary')
-const multiparty = require('multiparty')
+const {
+  IMAGE_OP_UPDATE,
+  IMAGE_OP_ADD,
+  IMAGE_OP_DELETE,
+  getImagesFromFormData
+} = require('../utilities/imageUtils')
+const { getUserEventsWithImages } = require('../utilities/eventUtils')
 
 const router = express.Router()
-
-// NOTE: These constants should match client side
-const IMAGE_OP_UPDATE = 'IMAGE_OP_UPDATE'
-const IMAGE_OP_ADD = 'IMAGE_OP_ADD'
-const IMAGE_OP_DELETE = 'IMAGE_OP_DELETE'
-
-const toImageProps = image => {
-  return {
-    id: image.id,
-    image_url: image.image_url
-  }
-}
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -57,72 +52,16 @@ router.get('/:email/hosted', (req, res, next) => {
   }).catch((err) => next(err))
 })
 
-const getMyActivities = (done, req, res, next) => {
-  // console.log('In router GET: /users/all', req.params)
-  const userEventService = new UserEventService()
-  const momentImageService = new MomentImageService()
-  const imagesPromise = momentImageService.getAllUserImages(req.params.id)
-  const eventsPromise = userEventService.getAllUserEvents(req.params.id, done)
-  Promise.all([imagesPromise, eventsPromise]).then(values => {
-    const [outImages, outEvents] = values
-    outImages.forEach(image => {
-      for (let event of outEvents) {
-        //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
-        if (event.event_id === image.event_id) {
-          if (event.images) {
-            console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
-            event.images.push(toImageProps(image))
-          } else {
-            console.log('ADDING FIRST IMAGE:', event.event_title, event.first_name, image)
-            event.images = [toImageProps(image)]
-          }
-        }
-      }
-    })
-    // console.log('event images POST returning:', outEvents)
-    res.json(outEvents)
-  }).catch((err) => {
-    //console.log('ERR:', err)
-    next(err)
-  })
-}
-
 router.get('/:id/new', (req, res, next) => {
-  getMyActivities(false, req, res, next)
+  getUserEventsWithImages(req.params.id, false)
+  .then(events => res.json(events))
+  .catch((error) => next(error))
 })
 
 router.get('/:id/old', (req, res, next) => {
-  getMyActivities(true, req, res, next)
-})
-
-router.get('/:id/all', (req, res, next) => {
-  // console.log('In router GET: /users/all', req.params)
-  const userEventService = new UserEventService()
-  const momentImageService = new MomentImageService()
-  const imagesPromise = momentImageService.getAllUserImages(req.params.id)
-  const eventsPromise = userEventService.getAllUserEvents(req.params.id)
-  Promise.all([imagesPromise, eventsPromise]).then(values => {
-    const [outImages, outEvents] = values
-    outImages.forEach(image => {
-      for (let event of outEvents) {
-        //console.log('PROCESSING EVENT:', event.event_title, event.first_name, event.user_id, image)
-        if (event.event_id === image.event_id) {
-          if (event.images) {
-            console.log('ADDING IMAGE:', event.event_title, event.first_name, image)
-            event.images.push(toImageProps(image))
-          } else {
-            console.log('ADDING FIRST IMAGE:', event.event_title, event.first_name, image)
-            event.images = [toImageProps(image)]
-          }
-        }
-      }
-    })
-    console.log('event images POST returning:', outEvents)
-    res.json(outEvents)
-  }).catch((err) => {
-    //console.log('ERR:', err)
-    next(err)
-  })
+  getUserEventsWithImages(req.params.id, true)
+  .then(events => res.json(events))
+  .catch((error) => next(error))
 })
 
 router.get('/:email/others', (req, res, next) => {
@@ -179,20 +118,8 @@ router.post('/:id/images', (req, res, next) => {
 
   const form = new multiparty.Form()
   form.parse(req, (err, fields, files) => {
-    const images = []
-    Object.entries(fields).forEach(
-      ([key, value]) => {
-        if (!files[key]) {
-          next(boom.badRequest(`Image file for entry ${key} not found`))
-          return
-        }
-        const image = JSON.parse(value[0])
-        image.image_url = files[key][0].path
-        images.push(image)
-      }
-    )
-    if (images.length === 0) {
-      next(boom.badRequest('No valid images provided'))
+    const images = getImagesFromFormData(fields, files, next)
+    if (!images) {
       return
     }
 

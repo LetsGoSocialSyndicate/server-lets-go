@@ -17,9 +17,9 @@ const {
   IMAGE_OP_UPDATE,
   IMAGE_OP_ADD,
   IMAGE_OP_DELETE,
-  getImagesFromFormData,
-  getAllUserEventsWithImages
+  getImagesFromFormData
 } = require('../utilities/imageUtils')
+const { getUserEventsWithImages } = require('../utilities/eventUtils')
 const {
   cloudinaryForceAddImage,
   cloudinaryRemoveImage
@@ -29,9 +29,6 @@ const {
   constructFailure,
   invalidInput
 } = require('../utilities/routeUtil')
-
-
-
 
 /* GET event listing. */
 router.get('/', (req, res, next) => {
@@ -245,13 +242,18 @@ router.post('/:user_id/:event_id/images', (req, res, next) => {
 
     const momentImageService = new MomentImageService()
     const results = images.map(
-      image => processImageOpRequest(momentImageService, req.params.event_id, req.params.user_id, image)
+      image => processImageOpRequest(
+        momentImageService,
+        req.params.event_id,
+        req.params.user_id,
+        image
+      )
     )
 
     Promise.all(results)
-      .then(() => getAllUserEventsWithImages(momentImageService, req.params.user_id))
+      .then(() => getUserEventsWithImages(req.params.user_id, true))
       .then(events => res.json(events))
-      .catch((localErr) => next(localErr))
+      .catch((error) => next(error))
   })
 })
 

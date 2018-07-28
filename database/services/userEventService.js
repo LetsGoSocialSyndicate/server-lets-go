@@ -9,7 +9,16 @@ const { userTable, eventTable, userEventTable, profileImageTable,
   USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS, DATETIME_FORMAT
 } = require('./constants')
 
-const END_OF_TIME = '2018 07 01 00:00:00'
+const formatTime = time => time.format(DATETIME_FORMAT)
+
+const getTimeRange = done => {
+  const now = moment()
+  if (done) {
+    return [formatTime(moment(0)), formatTime(now)]
+  } else {
+    return [formatTime(now), formatTime(now.add(3, 'd'))]
+  }
+}
 
 class UserEventService {
   getAllEvents() {
@@ -69,13 +78,7 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const now = moment()
-    let startTime = now.format(DATETIME_FORMAT)
-    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
-    if (done) {
-      endTime = startTime
-      startTime = END_OF_TIME
-    }
+    const timeRange = getTimeRange(done)
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -83,7 +86,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
-      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
+      .whereBetween(`${eventTable}.start_time`, timeRange)
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -102,20 +105,14 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const now = moment()
-    let startTime = now.format(DATETIME_FORMAT)
-    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
-    if (done) {
-      endTime = startTime
-      startTime = END_OF_TIME
-    }
+    const timeRange = getTimeRange(done)
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
-      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
+      .whereBetween(`${eventTable}.start_time`, timeRange)
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -133,20 +130,14 @@ class UserEventService {
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
-    const now = moment()
-    let startTime = now.format(DATETIME_FORMAT)
-    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
-    if (done) {
-      endTime = startTime
-      startTime = END_OF_TIME
-    }
+    const timeRange = getTimeRange(done)
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .whereNot(`${userTable}.id`, userId)
-      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
+      .whereBetween(`${eventTable}.start_time`, timeRange)
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
@@ -164,20 +155,14 @@ class UserEventService {
     if (!eventId) {
       throw boom.badRequest('Event id is required')
     }
-    const now = moment()
-    let startTime = now.format(DATETIME_FORMAT)
-    let endTime = now.add(3, 'd').format(DATETIME_FORMAT)
-    if (done) {
-      endTime = startTime
-      startTime = END_OF_TIME
-    }
+    const timeRange = getTimeRange(done)
     return knex(eventTable)
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .innerJoin(userTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
-      .whereBetween(`${eventTable}.start_time`, [startTime, endTime])
+      .whereBetween(`${eventTable}.start_time`, timeRange)
       .orderBy(`${eventTable}.start_time`, 'desc')
       .then((rows) => {
         if (rows.length > 0) {
