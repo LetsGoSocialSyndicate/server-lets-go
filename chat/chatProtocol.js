@@ -20,16 +20,23 @@ const GET_PREVIOUS_MESSAGES = 'getPreviousMessages'
 // Sends message from current user to another chatmate.
 // Direction: Client -> Server
 // Params: userId, message
-//         where message is { _id, text, createdAt, type, user}
+//         where message is { _id, text, createdAt, type, eventId, user}
 //         where user is {_id, name, avatar}
+//         and eventId is optional (null for non-join-request)
 const SEND_MESSAGE = 'sendMessage'
 
 // Sends 'request to join an activity' from current user to the host of the event.
 // Direction: Client -> Server
 // Params: userId, message
-//         where message is { _id, text, createdAt, type, user}
+//         where message is { _id, text, createdAt, type, eventId, user}
 //         where user is {_id, name, avatar}
+//         and eventId is optional (null for non-join-request)
 const SEND_JOIN_REQUEST = 'sendJoinRequest'
+
+// Deletes message from current user to another chatmate.
+// Direction: Client -> Server
+// Params: messageId
+const DELETE_MESSAGE = 'deleteMessage'
 
 // Response to JOIN request.
 // Sends list of users with which current user had conversations.
@@ -44,16 +51,18 @@ const CHATMATES = 'chatmates'
 // Direction: Server -> Client
 // Params: chatmate, [message, ...]
 //         where chatmate is {_id, name, avatar}
-//         where message is { _id, text, createdAt, type, user}
+//         where message is { _id, text, createdAt, type, eventId, user}
 //         where user is {_id, name, avatar}
+//         and eventId is optional (null for non-join-request)
 const PREVIOUS_MESSAGES = 'previousMessages'
 
 // Response to SEND_MESSAGE request.
 // Dispatches message from current user to another chatmate.
 // Direction: Server -> Client
 // Params: message
-//         where message is { _id, text, createdAt, type, user}
+//         where message is { _id, text, createdAt, type, eventId, user}
 //         where user is {_id, name, avatar}
+//         and eventId is optional (null for non-join-request)
 const MESSAGE = 'message'
 
 
@@ -65,6 +74,7 @@ module.exports = {
   JOIN,
   GET_PREVIOUS_MESSAGES,
   SEND_MESSAGE,
+  DELETE_MESSAGE,
   SEND_JOIN_REQUEST,
   CHATMATES,
   PREVIOUS_MESSAGES,

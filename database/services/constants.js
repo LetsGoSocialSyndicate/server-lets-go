@@ -89,7 +89,8 @@ const MESSAGE_FIELDS_WITH_USERNAMES = [
   'messages.id as id', 'messages.message as message',
   'messages.sender as sender', 'messages.recipient as recipient',
   'messages.sent_at as sent_at', 'messages.message_type as message_type',
-  'users.first_name as first_name', 'users.last_name as last_name'
+  'users.first_name as first_name', 'users.last_name as last_name',
+  'messages.event_id as event_id'
 ]
 
 const CHAT_USERS_FIELDS = [
@@ -97,7 +98,8 @@ const CHAT_USERS_FIELDS = [
   'messages.message as message', 'messages.sent_at as sent_at',
   'users.first_name as first_name', 'users.last_name as last_name',
   'profile_images.image_url as image_url',
-  'messages.message_type as message_type'
+  'messages.message_type as message_type',
+  'messages.event_id as event_id'
 ]
 
 module.exports = {

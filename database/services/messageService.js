@@ -1,6 +1,7 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
+/* eslint-disable arrow-body-style */
 const knex = require('../../knex')
 const boom = require('boom')
 const moment = require('moment')
@@ -11,6 +12,7 @@ const {
   MESSAGE_FIELDS_WITH_USERNAMES,
   CHAT_USERS_FIELDS
 } = require('./constants')
+const { MESSAGE_TYPE_JOIN_REQUEST } = require('../../chat/chatProtocol')
 
 const dedupChatmates = array => {
   const deduped = {}
@@ -164,6 +166,16 @@ class MessageService {
       })
   }
 
+  getJoinRequestsForSender(eventId, sender) {
+    return knex(messageTable)
+      .select(MESSAGE_FIELDS_WITH_USERNAMES)
+      .innerJoin(userTable, `${messageTable}.sender`, `${userTable}.id`)
+      .where({ message_type: MESSAGE_TYPE_JOIN_REQUEST, event_id: eventId, sender })
+      .catch((err) => {
+        console.log('ERROR in MessageService.getJoinRequestsForSender:', err)
+        throw boom.badImplementation(`Error retrieving join requests`)
+      })
+  }
   insert(message) {
     // ID is create by GiftedChat on client side when sending message.
     if (!message.id) {

@@ -5,7 +5,7 @@ const { UUID_UNIVERSITY_OF_COLORADO, USER_FIELDS } = require('./constants')
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
-const { userTable, momentImageTable } = require('./constants')
+const { userTable } = require('./constants')
 const ProfileImageService = require('./profileImageService')
 
 const mergeProfileImages = (user) => {
@@ -32,7 +32,7 @@ class UserService {
         throw boom.notFound(`No users found`)
       })
       .catch((err) => {
-        console.log('get User: err', err)
+        console.log('ERROR in userService.getList:', err)
         throw boom.badImplementation(`Error retrieving users`)
       })
   }
@@ -54,11 +54,13 @@ class UserService {
         throw boom.notFound(`No user found for the id, ${id}`)
       })
       .catch((err) => {
+        console.log('ERROR in userService.getById:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error retrieving user with the id, ${id}`)
       })
   }
 
   getByEmail(email, fetchImages = true) {
+    // console.log('userService.getByEmail:', email, fetchImages)
     if (!email) {
       throw boom.badRequest('Email is required')
     }
@@ -75,7 +77,7 @@ class UserService {
         throw boom.notFound(`No users found for the email, ${email}`)
       })
       .catch((err) => {
-        console.log('getByEmail:', err)
+        console.log('ERROR in userService.getByEmail:', err)
         throw err.isBoom
           ? err
           : boom.badImplementation(`Error retrieving user by the email, ${email}`)
@@ -103,7 +105,7 @@ class UserService {
         throw boom.badImplementation(`Unable to insert user`)
       })
       .catch((err) => {
-        console.log('user insert error:', err)
+        console.log('ERROR in userService.insert:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user`)
       })
   }
@@ -117,7 +119,6 @@ class UserService {
     } else {
       throw boom.badRequest('Email or Id is required')
     }
-    // console.log('user update start:', user)
     return knex(userTable)
       .where(params.key, params.value)
       // object keys === database keys
@@ -126,7 +127,6 @@ class UserService {
       .update(omitProfileImages(user))
       .returning(USER_FIELDS)
       .then((rows) => {
-        // console.log('update rows', rows)
         if (rows.length === 1) {
           return fetchImages ? mergeProfileImages(rows[0]) : rows[0]
         }
@@ -136,7 +136,7 @@ class UserService {
         throw boom.badImplementation(`Unable to update user`)
       })
       .catch((err) => {
-        console.log('user update error:', err)
+        console.log('ERROR in userService.update:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error updating user`)
       })
   }
@@ -161,6 +161,32 @@ class UserService {
         throw boom.badImplementation(`Unable to delete user`)
       })
       .catch((err) => {
+        console.log('ERROR in userService.delete:', err)
+        throw err.isBoom ? err : boom.badImplementation(`Error deleting user`)
+      })
+  }
+
+  deleteByEmail(email) {
+    if (!email) {
+      throw boom.badRequest('User email is required')
+    }
+
+    return knex(userTable)
+      .where('email', email)
+      .del()
+      .returning(USER_FIELDS)
+      .then((rows) => {
+        if (rows.length === 1) {
+          // Cannot return image here becuase they are cascade deleted
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many users for the id, ${rows[0].id}`)
+        }
+        throw boom.badImplementation(`Unable to delete user`)
+      })
+      .catch((err) => {
+        console.log('ERROR in userService.delete:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error deleting user`)
       })
   }

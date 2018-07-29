@@ -1,12 +1,13 @@
 /*
  * Copyright 2018, Socializing Syndicate Corp.
  */
+/* eslint-disable no-else-return */
 const knex = require('../../knex')
 const boom = require('boom')
 const uuid = require('uuid/v4')
 const moment = require('moment')
 const { userTable, eventTable, userEventTable, profileImageTable,
-  USER_EVENT_FIELDS, USER_EVENT_FULL_FIELDS, DATETIME_FORMAT
+  USER_EVENT_FIELDS, DATETIME_FORMAT
 } = require('./constants')
 
 const formatTime = time => time.format(DATETIME_FORMAT)
@@ -35,13 +36,13 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEvents: err', err)
+        console.log('ERROR in userEventService.getAllEvents:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
   getAllUserEvents(userId, done = false) {
-    console.log('getAllUserEvents', userId)
+    // console.log('getAllUserEvents', userId)
     return Promise.all([
       this.getAllEventsByParticipant(userId, done),
       this.getAllEventsByOrganizer(userId, done)
@@ -68,13 +69,13 @@ class UserEventService {
         throw boom.notFound(`No user-event record found for the id, ${user_event_id}`)
       })
       .catch((err) => {
-        console.log('getEventById: err', err)
+        console.log('ERROR in userEventService.getEventById:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
   getAllEventsByParticipant(userId, done = false) {
-    console.log('getAllEventsByParticipant', userId, done)
+    // console.log('getAllEventsByParticipant', userId, done)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
@@ -95,13 +96,13 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByParticipant: err', err)
+        console.log('ERROR in userEventService.getAllEventsByParticipant:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
 
   getAllEventsByOrganizer(userId, done = false) {
-    console.log('getAllEventsByOrganizer', userId, done)
+    // console.log('getAllEventsByOrganizer', userId, done)
     if (!userId) {
       throw boom.badRequest('User id is required')
     }
@@ -121,7 +122,7 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByOrganizer: err', err)
+        console.log('ERROR in userEventService.getAllEventsByOrganizer:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
@@ -146,7 +147,7 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getAllEventsByOtherOrganizer: err', err)
+        console.log('ERROR in userEventService.getAllEventsByOtherOrganizer:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
@@ -171,7 +172,7 @@ class UserEventService {
         return []
       })
       .catch((err) => {
-        console.log('getEventOrganizers: err', err)
+        console.log('ERROR in userEventService.getEventOrganizers:', err)
         throw boom.badImplementation(`Error retrieving events`)
       })
   }
@@ -198,7 +199,36 @@ class UserEventService {
         throw boom.notFound(`No user-event record found for the id, ${id}`)
       })
       .catch((err) => {
-        throw err.isBoom ? err : boom.badImplementation(`Error retrieving user-event record with the id, ${id}`)
+        console.log('ERROR in userEventService.get:', err)
+        throw err.isBoom
+          ? err
+          : boom.badImplementation(`Error retrieving user-event record with the id, ${id}`)
+      })
+  }
+
+  getEventByRequestor(eventId, userId) {
+    if (!eventId) {
+      throw boom.badRequest('Event id is required')
+    }
+    if (!userId) {
+      throw boom.badRequest('Requestor id is required')
+    }
+    return knex(userEventTable)
+      .where({ event_id: eventId, requested_by: userId })
+      .then((rows) => {
+        if (rows.length === 1) {
+          return rows[0]
+        }
+        if (rows.length > 1) {
+          throw boom.badImplementation(`Too many user-event record for the id, ${userId}`)
+        }
+        return null
+      })
+      .catch((err) => {
+        console.log('ERROR in userEventService.getEventByRequestor:', err)
+        throw err.isBoom
+          ? err
+          : boom.badImplementation(`Error retrieving user-event by requestor, ${userId}`)
       })
   }
 
@@ -217,10 +247,10 @@ class UserEventService {
         if (rows.length > 0) {
           return rows[0]
         }
-        return { count: 0}
+        return { count: 0 }
       })
       .catch((err) => {
-        console.log('countEventsByParticipant: err', err)
+        console.log('ERROR in userEventService.countEventsByParticipant:', err)
         throw boom.badImplementation(`Error counting events`)
       })
   }
@@ -239,10 +269,10 @@ class UserEventService {
         if (rows.length > 0) {
           return rows[0]
         }
-        return { count: 0}
+        return { count: 0 }
       })
       .catch((err) => {
-        console.log('countEventsByOrganizer: err', err)
+        console.log('ERROR in userEventService.countEventsByOrganizer:', err)
         throw boom.badImplementation(`Error counting events`)
       })
   }
@@ -267,17 +297,19 @@ class UserEventService {
         throw boom.badImplementation(`Unable to insert user-event record`)
       })
       .catch((err) => {
-        console.log(err)
+        console.log('ERROR in userEventService.insert:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error inserting user-event record`)
       })
   }
 
   update(record) {
+    // console.log('userEventService.update', record)
     if (!record.id) {
       throw boom.badRequest('User-Event record id is required')
     }
     return knex(userEventTable)
       .returning('*')
+      .where('id', record.id)
       .update(record)
       .then((rows) => {
         if (rows.length === 1) {
@@ -289,7 +321,7 @@ class UserEventService {
         throw boom.badImplementation(`Unable to update user-event record`)
       })
       .catch((err) => {
-        console.log(err)
+        console.log('ERROR in userEventService.update:', err)
         throw err.isBoom ? err : boom.badImplementation(`Error updating user-event record`)
       })
   }

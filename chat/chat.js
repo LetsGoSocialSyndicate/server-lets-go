@@ -2,6 +2,7 @@
  * Copyright 2018, Socializing Syndicate Corp.
  */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable arrow-body-style */
 const socketio = require('socket.io')
 const MessageService = require('../database/services/messageService')
 const UserService = require('../database/services/userService')
@@ -9,6 +10,7 @@ const {
   JOIN,
   GET_PREVIOUS_MESSAGES,
   SEND_MESSAGE,
+  DELETE_MESSAGE,
   SEND_JOIN_REQUEST,
   CHATMATES,
   PREVIOUS_MESSAGES,
@@ -52,7 +54,8 @@ const getServerMessageFromMessage = (chatmateId, message) => {
     sender: message.user._id,
     recipient: chatmateId,
     sent_at: message.createdAt,
-    message_type: message.type
+    message_type: message.type,
+    event_id: message.eventId
   }
 }
 
@@ -62,6 +65,7 @@ const getMessageFromServerMessage = (name, avatar, message) => {
     text: message.message,
     createdAt: message.sent_at,
     type: message.message_type,
+    eventId: message.event_id,
     user: {
       _id: message.sender,
       name,
@@ -144,15 +148,28 @@ const startChat = server => {
 
     socket.on(SEND_JOIN_REQUEST, (chatmateId, message) => {
       // console.log('Request to Join: user sent message', message, 'to', chatmateId)
-      const serverMessage = getServerMessageFromMessage(chatmateId, message)
-      console.log('SEND_JOIN_REQUEST', chatmateId, message, serverMessage)
-      messageService.insert(serverMessage).then(() => {
-        if (chatmateId in sockets) {
-          socket.to(sockets[chatmateId]).emit(MESSAGE, message)
-        } else {
-          console.log('CHAT WARNING: SEND_MESSAGE socked not found for', chatmateId)
-        }
-      })
+      // In case of join reqeust we need to do deduplication.
+      messageService.getJoinRequestsForSender(message.eventId, message.user._id)
+        .then(rows => {
+          if (rows.length > 0) {
+            console.log('CHAT. Already requested to join:', rows)
+            return
+          }
+          const serverMessage = getServerMessageFromMessage(chatmateId, message)
+          // console.log('SEND_JOIN_REQUEST', chatmateId, message, serverMessage)
+          messageService.insert(serverMessage).then(() => {
+            if (chatmateId in sockets) {
+              socket.to(sockets[chatmateId]).emit(MESSAGE, message)
+            } else {
+              console.log('CHAT WARNING: SEND_MESSAGE socked not found for', chatmateId)
+            }
+          })
+        })
+    })
+
+    socket.on(DELETE_MESSAGE, messageId => {
+      console.log('CHAT: user asked to delete message', messageId)
+      messageService.delete(messageId)
     })
   })
 }

@@ -1,4 +1,5 @@
 {
+  "extends": "rallycoding",
   "rules": {
     "comma-dangle": ["error", "never"],
     "no-cond-assign": "error",
@@ -75,7 +76,7 @@
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "array-bracket-spacing": ["error", "never"],
     "block-spacing": ["error", "always"],
-    "brace-style": ["error", "stroustrup"],
+    "brace-style": ["error", "1tbs"],
     "camelcase": 0,
     "comma-spacing": ["error", {"before": false, "after": true}],
     "comma-style": ["error", "last"],
@@ -121,4 +122,3 @@
     "chai": true
   }
 }
-
