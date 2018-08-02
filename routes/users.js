@@ -1,11 +1,11 @@
 /* Copyright 2018, Socializing Syndicate Corp. */
+/* eslint-disable arrow-body-style */
 const boom = require('boom')
 const express = require('express')
 const multiparty = require('multiparty')
 const ProfileImageService = require('../database/services/profileImageService')
 const UserService = require('../database/services/userService')
 const UserEventService = require('../database/services/userEventService')
-const MomentImageService = require('../database/services/momentImageService')
 const {
   cloudinaryForceAddImage,
   cloudinaryRemoveImage
@@ -54,23 +54,46 @@ router.get('/:email/hosted', (req, res, next) => {
 
 router.get('/:id/new', (req, res, next) => {
   getUserEventsWithImages(req.params.id, false)
-  .then(events => res.json(events))
-  .catch((error) => next(error))
+    .then(events => res.json(events))
+    .catch((error) => next(error))
 })
 
 router.get('/:id/old', (req, res, next) => {
   getUserEventsWithImages(req.params.id, true)
-  .then(events => res.json(events))
-  .catch((error) => next(error))
+    .then(events => res.json(events))
+    .catch((error) => next(error))
 })
+
+// TODO: This is temporary until proper user service are implemented
+const mergeRequestorInfo = (userEventService, row, user_id) => {
+  return userEventService.getEventByRequestor(row.event_id, user_id).then(
+    event => {
+      if (!event) {
+        return row
+      }
+      return {
+        ...row,
+        join_request_accepted_at: event.accepted_at,
+        join_request_accepted_by: event.accepted_by,
+        join_request_first_viewed_at: event.first_viewed_at,
+        join_request_first_viewed_by: event.first_viewed_by,
+        join_request_rejected_at: event.rejected_at,
+        join_request_rejected_by: event.rejected_by,
+        join_requested_at: event.requested_at,
+        join_requested_by: event.requested_by
+      }
+    }
+  )
+}
 
 router.get('/:email/others', (req, res, next) => {
   // console.log('In router GET: /users/others', req.user)
   const userEventService = new UserEventService()
   userEventService.getAllEventsByOtherOrganizer(req.user.id)
     .then((rows) => {
-      // console.log('All other events', rows)
-      res.json(rows)
+      Promise.all(rows.map(
+        row => mergeRequestorInfo(userEventService, row, req.user.id)
+      )).then(mergedRows => res.json(mergedRows))
     }).catch((err) => next(err))
 })
 

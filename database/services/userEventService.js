@@ -28,7 +28,7 @@ class UserEventService {
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .innerJoin(userEventTable, `${userEventTable}.posted_by`, `${userTable}.id`)
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
-      .orderBy(`${eventTable}.start_time`, 'desc')
+      .orderBy(`${eventTable}.start_time`, 'ascend')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -88,7 +88,7 @@ class UserEventService {
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'desc')
+      .orderBy(`${eventTable}.start_time`, 'ascend')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -114,7 +114,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'desc')
+      .orderBy(`${eventTable}.start_time`, 'ascend')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -139,7 +139,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .whereNot(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'desc')
+      .orderBy(`${eventTable}.start_time`, 'ascend')
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -164,7 +164,7 @@ class UserEventService {
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'desc')
+      .orderBy(`${eventTable}.start_time`, 'ascend')
       .then((rows) => {
         if (rows.length > 0) {
           return rows

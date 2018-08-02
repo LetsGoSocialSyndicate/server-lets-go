@@ -69,6 +69,7 @@ const MESSAGE = 'message'
 // Types of messages
 const MESSAGE_TYPE_CHAT = 'chat'
 const MESSAGE_TYPE_JOIN_REQUEST = 'joinRequest'
+const MESSAGE_TYPE_JOIN_REJECT = 'joinReject'
 
 module.exports = {
   JOIN,
@@ -80,5 +81,6 @@ module.exports = {
   PREVIOUS_MESSAGES,
   MESSAGE,
   MESSAGE_TYPE_CHAT,
-  MESSAGE_TYPE_JOIN_REQUEST
+  MESSAGE_TYPE_JOIN_REQUEST,
+  MESSAGE_TYPE_JOIN_REJECT
 }
