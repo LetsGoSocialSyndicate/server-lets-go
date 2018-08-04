@@ -9,7 +9,7 @@
 // It also serves as request to get list of users with which current user
 // had conversations.
 // Direction: Client -> Server
-// Params: userId
+// Params: userId, forceRefresh
 const JOIN = 'join'
 
 // Requests conversation history of current user with another chatmate.

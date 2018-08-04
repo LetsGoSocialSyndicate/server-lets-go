@@ -82,7 +82,7 @@ const startChat = server => {
     const messageService = new MessageService()
     const userService = new UserService()
     let sessionUserId = null
-    // console.log('CHAT: A client just joined on', socket.id)
+    console.log('CHAT: New connection on', socket.id)
 
     socket.on('disconnect', () => {
       // console.log('CHAT: user disconnected')
@@ -91,8 +91,11 @@ const startChat = server => {
       }
     })
 
-    socket.on(JOIN, (userId) => {
-      // console.log('CHAT: user requested to join', userId)
+    socket.on(JOIN, (userId, forceRefresh) => {
+      if (!forceRefresh && userId in sockets) {
+        return
+      }
+      console.log(`CHAT: user ${userId} requested to join on ${socket.id}`)
       sessionUserId = userId
       sockets[sessionUserId] = socket.id
       // TODO: Add here last message or at least timestamp of last message
@@ -109,7 +112,6 @@ const startChat = server => {
       // console.log('CHAT: user requested previous messages', userId, chatmateId)
       // TODO: Query and send user last X messages instead all
       // And implement onscroll...
-
       const userPromise = userService.getById(userId)
       const chatmatePromise = userService.getById(chatmateId)
       const messagesPromise = messageService.getMessages(userId, chatmateId)

@@ -72,7 +72,7 @@ exports.seed = (knex, Promise) => { // eslint-disable-line no-unused-vars
         {
           id: 'a44e7a37-3846-43ae-accd-0c382e9488ec',
           title: 'Soccer',
-          location: 'Erie Middle School, Erie, CO',
+          location: 'Erie Middle School',
           category: 'soccer',
           description: '',
           start_time: '2018-07-21 10:30:00',
