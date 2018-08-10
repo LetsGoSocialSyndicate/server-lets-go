@@ -80,6 +80,7 @@ class UserEventService {
       throw boom.badRequest('User id is required')
     }
     const timeRange = getTimeRange(done)
+    const order = done ? 'desc' : 'ascend'
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -88,7 +89,7 @@ class UserEventService {
       // .innerJoin('users as users2', `${userEventTable}.posted_by`, 'users2.id')
       .where(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'ascend')
+      .orderBy(`${eventTable}.start_time`, order)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -107,6 +108,7 @@ class UserEventService {
       throw boom.badRequest('User id is required')
     }
     const timeRange = getTimeRange(done)
+    const order = done ? 'desc' : 'ascend'
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -114,7 +116,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .where(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'ascend')
+      .orderBy(`${eventTable}.start_time`, order)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -132,6 +134,7 @@ class UserEventService {
       throw boom.badRequest('User id is required')
     }
     const timeRange = getTimeRange(done)
+    const order = done ? 'desc' : 'ascend'
     return knex(userTable)
       .select(USER_EVENT_FIELDS)
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
@@ -139,7 +142,7 @@ class UserEventService {
       .innerJoin(eventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
       .whereNot(`${userTable}.id`, userId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'ascend')
+      .orderBy(`${eventTable}.start_time`, order)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
@@ -157,6 +160,7 @@ class UserEventService {
       throw boom.badRequest('Event id is required')
     }
     const timeRange = getTimeRange(done)
+    const order = done ? 'desc' : 'ascend'
     return knex(eventTable)
       .select(USER_EVENT_FIELDS)
       .innerJoin(userEventTable, `${userEventTable}.event_id`, `${eventTable}.id`)
@@ -164,7 +168,7 @@ class UserEventService {
       .leftJoin(profileImageTable, `${profileImageTable}.user_id`, `${userTable}.id`)
       .where(`${eventTable}.id`, eventId)
       .whereBetween(`${eventTable}.start_time`, timeRange)
-      .orderBy(`${eventTable}.start_time`, 'ascend')
+      .orderBy(`${eventTable}.start_time`, order)
       .then((rows) => {
         if (rows.length > 0) {
           return rows
